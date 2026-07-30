@@ -1,18 +1,21 @@
 # Zalo Mini App UI Guideline
 
-A reusable, industry-specific UI and UX guideline for commerce-oriented Zalo Mini Apps.
+A reusable, industry-specific UI, UX, and administration guideline for commerce-oriented Zalo Mini Apps.
 
 ## Current Scope
 
 - [Shared Design Foundations](docs/shared/FOUNDATIONS.md)
-- [Beauty](docs/beauty/README.md)
-- [Fashion](docs/fashion/README.md)
+- [Shared Administration Features](docs/admin/SHARED-ADMIN-FEATURES.md)
+- [Beauty UI Guideline](docs/beauty/README.md)
+- [Beauty Administration Features](docs/beauty/ADMIN-FEATURES.md)
+- [Fashion UI Guideline](docs/fashion/README.md)
+- [Fashion Administration Features](docs/fashion/ADMIN-FEATURES.md)
 
 ## Purpose
 
-This repository is the single source of truth for product designers, product owners, frontend developers, backend developers, QA teams, and AI coding agents building Zalo Mini Apps.
+This repository is the single source of truth for product designers, product owners, frontend developers, backend developers, QA teams, administration operators, and AI coding agents building Zalo Mini Apps.
 
-Each industry may define its own visual language, catalog model, content hierarchy, filters, product variants, and business flows. However, all implementations must share the same foundations for spacing, touch targets, accessibility, interaction states, responsive behavior, safe areas, and backend-driven rendering.
+Each industry may define its own visual language, catalog model, content hierarchy, filters, product variants, administration modules, and business flows. However, all implementations must share the same foundations for spacing, touch targets, accessibility, interaction states, responsive behavior, safe areas, backend-driven rendering, permissions, auditability, and operational data management.
 
 ## Core Rules
 
@@ -23,39 +26,56 @@ Each industry may define its own visual language, catalog model, content hierarc
 5. Reuse shared components and design tokens before creating industry-specific variants.
 6. Prices, discounts, inventory, delivery expectations, return policies, and order statuses must be explicit and trustworthy.
 7. Product imagery must be optimized for mobile bandwidth and progressive loading.
-8. All user-facing documentation, component specifications, design tokens, and AI prompts in this repository must be written in English.
+8. Administration features must be permission-controlled, auditable, searchable, filterable, and exportable where operationally necessary.
+9. Industry-specific administration features must extend the shared administration foundation instead of duplicating common modules.
+10. All user-facing documentation, component specifications, design tokens, administration specifications, and AI prompts in this repository must be written in English.
 
 ## Repository Structure
 
 ```text
 docs/
+├── admin/
+│   └── SHARED-ADMIN-FEATURES.md
 ├── shared/
 │   └── FOUNDATIONS.md
 ├── beauty/
-│   └── README.md
+│   ├── README.md
+│   └── ADMIN-FEATURES.md
 └── fashion/
-    └── README.md
+    ├── README.md
+    └── ADMIN-FEATURES.md
 ```
 
 ## Recommended Implementation Model
 
 The Mini App should behave as a presentation shell. Content, catalog data, banners, navigation, feature flags, layout configuration, and theme settings should be delivered by backend APIs.
 
+The administration portal owns operational configuration and business data management.
+
 ```text
-Admin Portal
-    ↓
+Administration Portal
+        ↓
 Backend API + Database
-    ↓
-Layout Configuration + Catalog + User Data
-    ↓
+        ↓
+Catalog + Orders + Customers + Content + Layout Configuration
+        ↓
 Zalo Mini App Renderer
 ```
 
+## Administration Documentation Model
+
+Administration requirements are divided into two levels:
+
+1. **Shared administration foundation:** dashboard, products, orders, customers, promotions, content, notifications, reports, permissions, audit logs, imports, exports, Mini App configuration, and multi-tenant management.
+2. **Industry-specific extensions:** product attributes, operational workflows, analytics, and tools unique to Beauty, Fashion, or future categories.
+
 ## Status
 
-Version **1.0** currently covers two initial commerce categories:
+Version **1.1** currently covers two initial commerce categories:
 
 - Beauty and cosmetics
 - Fashion and apparel
 
-Additional industry guidelines should extend the shared foundations without redefining common interaction rules.
+Both categories now include UI guidelines and administration feature specifications.
+
+Additional industry guidelines should extend both the shared design foundations and the shared administration foundation without redefining common rules.
