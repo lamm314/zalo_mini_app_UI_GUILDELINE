@@ -1,23 +1,23 @@
-# Shared Foundations
+# Shared Design Foundations
 
-## 1. Mục tiêu nền tảng
+These foundations apply to every commerce-oriented Zalo Mini App in this repository. Industry guidelines may extend them, but must not contradict the core interaction, accessibility, performance, and backend-driven architecture rules defined here.
 
-Phần này áp dụng cho mọi Zalo Mini App thương mại điện tử trong repository. Guideline ngành chỉ được phép mở rộng hoặc điều chỉnh có kiểm soát, không phá vỡ các nguyên tắc cốt lõi.
+## 1. Design Principles
 
-## 2. Design principles
+- **Content first:** prioritize product imagery, product name, price, availability, and the primary action.
+- **One-hand friendly:** place essential actions inside comfortable thumb-reach zones.
+- **Fast to understand:** users should understand the purpose of a screen within three seconds.
+- **Backend driven:** banners, sections, navigation, themes, feature flags, and merchandising data must come from APIs.
+- **State complete:** every interactive component must define default, pressed, focus, disabled, loading, error, and success states where relevant.
+- **Trustworthy commerce:** pricing, discounts, stock, shipping, returns, and order status must be explicit.
+- **Progressive disclosure:** show essential information first and move secondary detail into accordions, sheets, or expandable areas.
+- **Mobile native, not mobile copied:** use patterns suitable for Zalo Mini Apps instead of imitating iOS or Android chrome.
 
-- **Content first:** ưu tiên hình ảnh, tên sản phẩm, giá và hành động chính.
-- **One-hand friendly:** CTA chính nằm trong vùng dễ chạm.
-- **Fast to understand:** người dùng phải hiểu mục đích màn hình trong 3 giây.
-- **Backend-driven:** banner, section, menu, theme và nội dung đến từ API.
-- **Consistent states:** mọi component có default, pressed, disabled, loading và error.
-- **Trustworthy commerce:** giá, khuyến mại, tồn kho, đổi trả và trạng thái đơn phải rõ ràng.
+## 2. Layout System
 
-## 3. Layout system
+Use a 4-point base grid, with 8-point increments preferred for major spacing.
 
-Dùng lưới 4pt, ưu tiên bội số 8.
-
-| Token | Giá trị |
+| Token | Value |
 |---|---:|
 | `space-1` | 4px |
 | `space-2` | 8px |
@@ -28,37 +28,45 @@ Dùng lưới 4pt, ưu tiên bội số 8.
 | `space-8` | 32px |
 | `space-10` | 40px |
 
-Padding ngang mặc định: **16px**. Màn hình rộng có thể tăng lên 20–24px. Không để nội dung quan trọng sát mép dưới 12px.
+Default horizontal screen padding is **16px**. Wider devices may use 20–24px. Important content should not sit closer than 12px to a device edge.
 
-## 4. Radius
+### Responsive Rules
 
-| Token | Giá trị | Dùng cho |
+- Must work from 320px width upward.
+- Product grids default to two columns on common mobile widths.
+- Avoid fixed card heights when content can wrap.
+- Keep text, icons, and controls inside safe areas.
+- Do not introduce horizontal scrolling unless content would otherwise become unreadable.
+
+## 3. Radius
+
+| Token | Value | Typical Use |
 |---|---:|---|
-| `radius-sm` | 8px | chip, badge nhỏ |
-| `radius-md` | 12px | input, button phụ |
-| `radius-lg` | 16px | product card, modal nhỏ |
-| `radius-xl` | 24px | hero card, bottom sheet |
-| `radius-pill` | 999px | filter chip, avatar |
+| `radius-sm` | 8px | Small chips and badges |
+| `radius-md` | 12px | Inputs and secondary buttons |
+| `radius-lg` | 16px | Product cards and compact modals |
+| `radius-xl` | 24px | Hero cards and bottom sheets |
+| `radius-pill` | 999px | Filter chips and avatars |
 
-## 5. Typography
+## 4. Typography
 
-Font mặc định dùng system sans-serif để tải nhanh và hiển thị ổn định.
+Use the system sans-serif stack for speed, readability, and rendering stability.
 
-| Style | Size | Weight | Dùng cho |
+| Style | Size | Weight | Use |
 |---|---:|---:|---|
-| Display | 32–36 | 600 | hero title |
-| H1 | 28 | 600 | tiêu đề màn hình |
-| H2 | 22–24 | 600 | tiêu đề section |
-| H3 | 18–20 | 600 | tên nhóm |
-| Body | 15–16 | 400 | nội dung chính |
-| Label | 14 | 500 | button, tab |
-| Caption | 12–13 | 400 | mô tả phụ |
+| Display | 32–36px | 600 | Hero title |
+| H1 | 28px | 600 | Screen title |
+| H2 | 22–24px | 600 | Section title |
+| H3 | 18–20px | 600 | Group title |
+| Body | 15–16px | 400 | Primary content |
+| Label | 14px | 500 | Buttons, tabs, controls |
+| Caption | 12–13px | 400 | Secondary details |
 
-Không dùng quá ba cấp độ chữ trên cùng một card.
+Do not use more than three typography levels inside one card. Never use decorative typefaces for prices, legal information, product ingredients, size details, or primary actions.
 
-## 6. Color tokens
+## 5. Color Tokens
 
-Mỗi ngành phải map về token thay vì dùng màu trực tiếp.
+Industry themes must map brand colors to semantic tokens rather than using raw values throughout components.
 
 ```json
 {
@@ -79,120 +87,145 @@ Mỗi ngành phải map về token thay vì dùng màu trực tiếp.
 }
 ```
 
-Màu chữ chính phải đủ tương phản. Không dùng màu nhạt cho thông tin giá, tồn kho hoặc CTA quan trọng.
+Primary text, prices, stock states, and critical CTAs must meet readable contrast requirements. Never communicate an important state through color alone.
 
-## 7. Navigation
+## 6. Navigation
 
-### Top bar
+### Top Bar
 
-Có thể gồm back, title, search, share, cart hoặc profile. Không đặt quá ba hành động bên phải.
+May include back, title, search, share, cart, or profile. Limit the right side to three actions.
 
-### Bottom navigation
+### Bottom Navigation
 
-Tối đa 5 mục. Mỗi mục có icon và label. Mục active phải rõ bằng màu, không chỉ dựa vào thay đổi icon.
+Use a maximum of five items. Every item requires both an icon and a text label. Active state must use more than an icon change alone.
 
-Đề xuất mặc định:
+Recommended default:
 
 - Home
-- Category
-- Explore/Scan
+- Categories
+- Explore, Scan, or Style
 - Orders
 - Profile
 
-## 8. Touch targets
+Only include a feature-specific center tab when the feature is genuinely available.
 
-- Tối thiểu 44 × 44px.
-- Khoảng cách giữa hai icon hành động tối thiểu 8px.
-- Button chính cao 48–52px.
-- Không đặt nút xóa nhỏ sát nút tăng/giảm số lượng.
+## 7. Touch Targets
 
-## 9. Component states
+- Minimum interactive area: **44 × 44px**.
+- Minimum spacing between adjacent icon actions: **8px**.
+- Primary button height: **48–52px**.
+- Never place destructive controls too close to quantity controls or primary CTAs.
 
-Mọi component tương tác phải có:
+## 8. Component States
+
+Every interactive component must define:
 
 - Default
-- Hover nếu chạy web preview
 - Pressed
 - Focus
 - Disabled
 - Loading
 - Error
-- Success khi phù hợp
+- Success where relevant
+- Hover for web preview only
 
-## 10. Loading và lỗi
+## 9. Loading, Empty, Error, and Offline States
 
-### Skeleton
+### Loading
 
-Dùng skeleton theo đúng cấu trúc nội dung thật. Không dùng spinner toàn màn hình nếu có thể hiển thị skeleton.
+Use skeletons that resemble the final content structure. Avoid full-screen spinners when partial content can render progressively.
 
-### Empty state
+### Empty
 
-Gồm icon hoặc minh họa, tiêu đề, mô tả ngắn và một CTA rõ ràng.
+Include a clear title, concise explanation, optional illustration, and one relevant CTA.
 
-### Error state
+### Error
 
-Nêu vấn đề bằng ngôn ngữ dễ hiểu và có nút `Thử lại`. Không hiển thị raw API error cho người dùng.
+Describe the problem in plain language and provide a retry action. Never show raw API errors.
 
-## 11. Sticky CTA
+### Offline
 
-- Dùng cho Add to cart, Buy now, Checkout, Place order.
-- Có nền riêng để tách khỏi nội dung cuộn.
-- Tính safe area phía dưới.
-- Khi bàn phím mở, tránh che input hoặc tổng tiền.
+Preserve previously loaded data where possible. Explain which actions require a connection.
 
-## 12. Backend-driven UI
+## 10. Sticky Actions
 
-Trang chủ nên được dựng từ danh sách section:
+Sticky actions are appropriate for Add to Cart, Buy Now, Checkout, and Place Order.
+
+- Use a visually separate surface.
+- Respect the device safe area.
+- Recalculate position when the keyboard opens.
+- Never cover product options, totals, or required fields.
+
+## 11. Backend-Driven UI
+
+Home pages should render from an ordered section configuration.
 
 ```json
 {
   "sections": [
-    { "type": "hero", "id": "hero-1", "order": 1 },
-    { "type": "category_grid", "id": "cat-1", "order": 2 },
-    { "type": "product_carousel", "id": "best-seller", "order": 3 },
-    { "type": "voucher_strip", "id": "voucher-1", "order": 4 }
+    { "type": "hero", "id": "hero-1", "order": 1, "visible": true },
+    { "type": "category_grid", "id": "category-1", "order": 2, "visible": true },
+    { "type": "product_carousel", "id": "best-sellers", "order": 3, "visible": true },
+    { "type": "voucher_strip", "id": "voucher-1", "order": 4, "visible": true }
   ]
 }
 ```
 
-Frontend phải render theo `type`, `order`, `visibility`, `theme` và dữ liệu API. Không cố định thứ tự section trong code.
+Frontend rendering must respect `type`, `order`, `visible`, `theme`, `audience`, and API data. Section order must not be fixed in source code.
 
-## 13. Accessibility
+## 12. Accessibility
 
-- Không truyền đạt trạng thái chỉ bằng màu.
-- Icon quan trọng có label hoặc accessible name.
-- Hỗ trợ phóng to chữ hợp lý.
-- Không dùng text dưới 12px.
-- Hình ảnh sản phẩm cần alt text mô tả ngắn.
+- Do not communicate state through color alone.
+- Give meaningful icons accessible names.
+- Support reasonable text enlargement.
+- Do not use text smaller than 12px.
+- Provide concise product image alt text.
+- Keep focus order aligned with visual order.
+- Make validation messages specific and actionable.
 
-## 14. Motion
+## 13. Motion
 
-- Duration: 180–300ms.
-- Easing tự nhiên, không bounce quá mạnh.
-- Dùng fade, slide và scale nhẹ.
-- Không làm animation cản thao tác mua hàng.
+- Typical duration: 180–300ms.
+- Prefer fade, slide, and subtle scale.
+- Avoid strong bounce effects.
+- Do not delay commerce actions with decorative animation.
+- Respect reduced-motion preferences where the platform allows it.
 
-## 15. Developer handoff
+## 14. Performance
 
-Mỗi component cần ghi rõ:
+- Use responsive images and modern formats.
+- Lazy-load below-the-fold imagery.
+- Avoid autoplay video on initial load.
+- Prevent layout shift by reserving image dimensions.
+- Cache configuration and catalog data where appropriate.
+- Keep first-screen content lightweight.
 
+## 15. Developer Handoff
+
+Each component specification should define:
+
+- Purpose
 - Props
-- Variant
-- State
-- Token sử dụng
-- Kích thước
-- Khoảng cách
-- Hành vi khi loading/error
-- Mapping API
-- Quy tắc responsive
+- Variants
+- States
+- Design tokens
+- Dimensions
+- Spacing
+- Loading and error behavior
+- API mapping
+- Responsive rules
+- Accessibility notes
+- Analytics events
 
-## 16. Definition of done
+## 16. Definition of Done
 
-Một màn hình chỉ được xem là hoàn thành khi:
+A screen is complete only when it:
 
-- Đúng token và spacing.
-- Không tràn ở chiều rộng 320px.
-- Có loading, empty, error.
-- CTA không bị che.
-- Dữ liệu có thể thay bằng API.
-- Không hardcode nội dung ngành trong component dùng chung.
+- Uses approved tokens and spacing.
+- Works at 320px width without overflow.
+- Includes loading, empty, error, and retry states.
+- Keeps primary actions visible and reachable.
+- Can render with API-provided data.
+- Does not hardcode industry-specific content inside shared components.
+- Handles long names, missing imagery, and unavailable variants.
+- Includes analytics event definitions for critical actions.
