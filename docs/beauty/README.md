@@ -1,43 +1,45 @@
 # Beauty Zalo Mini App UI Guideline
 
-## 1. Phạm vi
+## 1. Scope
 
-Guideline này dành cho Zalo Mini App bán:
+This guideline applies to Zalo Mini Apps selling or promoting:
 
 - Skincare
 - Makeup
-- Nước hoa
-- Chăm sóc tóc
-- Chăm sóc cơ thể
+- Fragrance
+- Hair care
+- Body care
 - Beauty devices
-- Spa hoặc dịch vụ làm đẹp có bán sản phẩm
+- Spa and beauty services with product sales
 
-Mục tiêu là tạo giao diện cao cấp, mềm mại, hiện đại, giàu hình ảnh nhưng vẫn tối ưu chuyển đổi mua hàng.
+The intended experience is premium, modern, visually rich, and conversion-focused without becoming visually crowded.
 
-## 2. Visual direction
+## 2. Visual Direction
 
-Phong cách đề xuất:
+Recommended qualities:
 
-- Premium minimal
-- Editorial beauty
+- Premium minimalism
+- Editorial beauty styling
 - Soft luxury
-- Clean clinical khi cần thể hiện thành phần hoặc hiệu quả
-- Khoảng trắng rộng
-- Hình ảnh sản phẩm lớn
-- Card bo góc mềm
-- Shadow rất nhẹ
+- Clean clinical presentation for ingredients and efficacy information
+- Generous whitespace
+- Large product imagery
+- Soft card radii
+- Very light shadows
+- Calm, confident motion
 
-Không nên:
+Avoid:
 
-- Dùng quá nhiều màu nổi trong một màn hình
-- Dùng gradient mạnh ở mọi section
-- Đặt quá nhiều badge sale
-- Làm giao diện giống website desktop thu nhỏ
-- Sao chép Dynamic Island hoặc chrome iOS
+- Too many saturated colors on one screen
+- Strong gradients in every section
+- Excessive sale badges
+- Desktop layouts compressed into mobile
+- Imitating iOS chrome or Dynamic Island patterns
+- Medical-style claims without verified source data
 
-## 3. Beauty color system
+## 3. Color System
 
-### Palette mặc định
+Default beauty palette:
 
 ```json
 {
@@ -56,29 +58,30 @@ Không nên:
 }
 ```
 
-Có thể thay palette theo thương hiệu, nhưng vẫn phải map về token chung.
+Brand palettes may vary, but every raw value must map to a semantic token.
 
 ## 4. Typography
 
-- Sans-serif cho toàn bộ UI và dữ liệu thương mại.
-- Có thể dùng serif hoặc script font cho một phần hero title, nhưng không dùng cho giá, thành phần, hướng dẫn hoặc CTA.
-- Tên sản phẩm: 16–18px, tối đa 2 dòng trên card.
-- Giá hiện tại: 18–22px, weight 600.
-- Giá cũ: 13–15px, gạch ngang.
+- Use sans-serif for all commerce, product, price, ingredient, and instructional content.
+- Serif or script may be used only for a limited hero headline.
+- Product name: 16–18px, maximum two lines on cards.
+- Current price: 18–22px, weight 600.
+- Previous price: 13–15px with strikethrough.
+- Ingredient and usage text: minimum 14px.
 
-## 5. Information architecture
+## 5. Information Architecture
 
-### Bottom navigation đề xuất
+Recommended bottom navigation:
 
-1. Trang chủ
-2. Danh mục
-3. Soi da / Thử makeup
-4. Đơn hàng
-5. Cá nhân
+1. Home
+2. Categories
+3. Skin Scan or Try-On
+4. Orders
+5. Profile
 
-Tab AI chỉ hiển thị khi Mini App thật sự có tính năng này.
+Only show an AI or camera tab when the feature is fully available.
 
-### Nhóm danh mục phổ biến
+Common category groups:
 
 - Best Sellers
 - Cleanser
@@ -92,266 +95,269 @@ Tab AI chỉ hiển thị khi Mini App thật sự có tính năng này.
 - Fragrance
 - Beauty Tools
 
-## 6. Home screen
+## 6. Home Screen
 
-Thứ tự section khuyến nghị:
+Recommended section order:
 
-1. Header với logo, search, cart, profile
+1. Header with logo, search, cart, and profile
 2. Hero banner
-3. Quick category
-4. Beauty concern
+3. Quick categories
+4. Shop by concern
 5. Best sellers
 6. New arrivals
 7. Routine builder
-8. Voucher
+8. Voucher strip
 9. Brand story
-10. Reviews hoặc social proof
+10. Reviews or social proof
 
-### Hero banner
+### Hero Banner
 
-- Tỷ lệ gợi ý 4:5 hoặc 3:4 trên mobile.
-- Ảnh lifestyle hoặc product composition.
-- Overlay gradient để chữ dễ đọc.
-- Chỉ một CTA chính.
-- Nội dung tối đa: eyebrow, headline, subheadline, CTA.
+- Prefer a 4:5 or 3:4 mobile ratio.
+- Use lifestyle or product-composition imagery.
+- Add a subtle overlay only when necessary for text readability.
+- Use one primary CTA.
+- Limit content to eyebrow, headline, subheadline, and CTA.
 
-### Beauty concern section
+### Shop by Concern
 
-Cho phép duyệt sản phẩm theo nhu cầu:
+Typical concerns:
 
-- Mụn
-- Khô
-- Nhạy cảm
-- Thâm nám
-- Lão hóa
-- Lỗ chân lông
-- Da xỉn màu
+- Acne
+- Dryness
+- Sensitivity
+- Dark spots
+- Aging
+- Enlarged pores
+- Dullness
 
-Mỗi concern dùng icon hoặc ảnh đơn giản, không dùng hình minh họa gây khó chịu.
+Use calm icons or imagery. Avoid uncomfortable medical imagery.
 
-## 7. Product card
+## 7. Product Card
 
-### Nội dung bắt buộc
+Required content:
 
-- Ảnh sản phẩm
-- Tên
-- Giá
-- Giá cũ nếu có
-- Rating và số đánh giá khi dữ liệu đủ tin cậy
-- Badge sale hoặc new
-- Nút yêu thích
+- Product image
+- Product name
+- Current price
+- Previous price when applicable
+- Rating and review count when reliable
+- Sale or new badge
+- Wishlist action
 
-### Nội dung tùy chọn
+Optional content:
 
-- Loại da
-- Công dụng chính
-- Dung tích
+- Skin type
+- Main benefit
+- Volume
 - Shade count
 - Quick add
 
-### Quy tắc
+Rules:
 
-- Ảnh chiếm khoảng 60–70% diện tích card.
-- Không hiển thị quá 2 badge.
-- Tên tối đa 2 dòng.
-- Không làm card quá cao vì mô tả dài.
-- Dùng background trung tính để sản phẩm nổi bật.
+- Image should occupy approximately 60–70% of the card.
+- Show no more than two badges.
+- Product name must not exceed two lines.
+- Keep backgrounds neutral so the product remains visually dominant.
+- Use a consistent image aspect ratio within each grid.
 
-## 8. Product listing
+## 8. Product Listing
 
-Header gồm:
+Header should include:
 
-- Tên danh mục
-- Số lượng sản phẩm
+- Category name
+- Product count
 - Filter
 - Sort
-- Chuyển grid 2 cột hoặc list nếu cần
+- Optional grid/list toggle
 
-Filter beauty thường gồm:
+Common beauty filters:
 
-- Loại sản phẩm
-- Loại da
-- Vấn đề da
-- Thành phần
-- Thương hiệu
-- Khoảng giá
+- Product type
+- Skin type
+- Skin concern
+- Ingredient
+- Brand
+- Price range
 - Rating
-- Dung tích
-- Không cồn / không hương liệu / vegan nếu có dữ liệu xác minh
+- Volume
+- Alcohol-free, fragrance-free, vegan, or cruelty-free only when verified
 
-Filter mở bằng bottom sheet, có nút `Áp dụng` và `Xóa bộ lọc`.
+Open filters in a bottom sheet with clear `Apply` and `Clear all` actions.
 
-## 9. Product detail
+## 9. Product Detail
 
-### Cấu trúc
+Recommended structure:
 
 1. Gallery
-2. Tên sản phẩm
+2. Product name
 3. Rating
-4. Giá và khuyến mại
-5. Variant: shade, size, volume
-6. Tóm tắt công dụng
-7. Chọn số lượng
-8. Sticky CTA
-9. Tabs hoặc accordion
-10. Sản phẩm liên quan
+4. Price and promotion
+5. Variant selection: shade, size, or volume
+6. Benefit summary
+7. Quantity
+8. Sticky action area
+9. Accordions or tabs
+10. Related products
 
-### Tabs đề xuất
+Recommended detail sections:
 
-- Tổng quan
-- Thành phần
-- Cách dùng
-- Đánh giá
-- Chính sách
+- Overview
+- Ingredients
+- How to Use
+- Reviews
+- Shipping and Returns
 
-### Thành phần
+### Ingredients
 
-- Hiển thị key ingredients trước.
-- Full INCI list nằm trong accordion.
-- Không dùng các claim y tế nếu dữ liệu không được xác minh.
-- Có cảnh báo dị ứng hoặc patch test khi phù hợp.
+- Show key ingredients first.
+- Place the full INCI list in an accordion.
+- Do not present unverified medical claims.
+- Include allergy or patch-test guidance where relevant.
 
-### Shade selector
+### Shade Selector
 
-- Swatch tối thiểu 32px.
-- Swatch được chọn có border rõ.
-- Hiển thị tên shade bằng text.
-- Không chỉ dùng màu để phân biệt.
+- Minimum swatch size: 32px.
+- Selected state requires a clear border or indicator.
+- Always show the shade name as text.
+- Never rely on color alone.
 
-## 10. Routine builder
+## 10. Routine Builder
 
-Luồng đề xuất:
+Recommended flow:
 
-1. Chọn loại da
-2. Chọn vấn đề chính
-3. Chọn mức độ nhạy cảm
-4. Chọn ngân sách
-5. Nhận routine sáng/tối
+1. Select skin type
+2. Select primary concern
+3. Select sensitivity level
+4. Select budget
+5. Receive morning and evening routines
 
-Kết quả phải gồm:
+Result should include:
 
-- Thứ tự sử dụng
-- Tần suất
-- Hướng dẫn ngắn
-- Tổng giá
-- Thêm toàn bộ vào giỏ
+- Product order
+- Frequency
+- Short instructions
+- Total price
+- Add-all-to-cart action
+- Warnings for ingredient conflicts when verified rules exist
 
-## 11. AI skin scan
+## 11. AI Skin Scan
 
-Chỉ thiết kế khi backend và quyền sử dụng hình ảnh đã rõ.
+Only design this feature when image-processing capabilities, privacy terms, and consent rules are defined.
 
-Màn hình cần:
+Required screens and states:
 
-- Giải thích dữ liệu được dùng thế nào
-- Consent rõ ràng
-- Hướng dẫn ánh sáng, khoảng cách, góc mặt
-- Trạng thái scanning
-- Kết quả theo nhóm vấn đề
-- Mức độ tin cậy hoặc lưu ý kết quả tham khảo
-- CTA xem routine hoặc sản phẩm phù hợp
+- Clear explanation of data use
+- Explicit consent
+- Lighting, distance, and face-angle guidance
+- Camera permission state
+- Scanning progress
+- Result grouped by concern
+- Confidence or reference-only notice
+- CTA to routine or recommended products
+- Delete-image and retake controls
 
-Không nên hiển thị kết luận như chẩn đoán y khoa.
+Do not present the result as a medical diagnosis.
 
-## 12. Virtual try-on
+## 12. Virtual Try-On
 
-Dùng cho son, má hồng, eye makeup hoặc hair color.
+Suitable for lipstick, blush, eye makeup, or hair color.
 
-UI gồm:
+UI should include:
 
-- Camera hoặc ảnh tải lên
-- Danh sách shade
-- Tên shade
-- Mức độ filter
-- Ảnh trước/sau
+- Camera or uploaded image
+- Shade list
+- Shade name
+- Effect intensity where supported
+- Before and after view
 - Add to cart
-- Disclaimer kết quả có thể khác tùy ánh sáng và thiết bị
+- Disclaimer that results vary by lighting, screen, and device
 
 ## 13. Cart
 
-Mỗi item gồm:
+Each item should show:
 
 - Thumbnail
-- Tên
-- Variant
-- Giá
+- Name
+- Selected variant
+- Price
 - Quantity stepper
-- Xóa hoặc lưu sau
+- Remove or save-for-later action
 
-Cuối màn hình:
+Order summary:
 
 - Voucher
-- Tạm tính
-- Giảm giá
-- Phí vận chuyển
-- Tổng cộng
-- Sticky Checkout
+- Subtotal
+- Discount
+- Shipping fee
+- Total
+- Sticky checkout CTA
 
-Có cảnh báo khi shade hoặc size hết hàng.
+Warn users when a shade, size, or gift item becomes unavailable.
 
 ## 14. Checkout
 
-Các block:
+Required blocks:
 
-- Người nhận
-- Địa chỉ
-- Phương thức giao hàng
+- Recipient
+- Address
+- Delivery method
 - Voucher
-- Phương thức thanh toán
-- Ghi chú
-- Tóm tắt đơn hàng
-- Điều khoản
+- Payment method
+- Note
+- Order summary
+- Terms acceptance
 
-Không để nút `Đặt hàng` active khi chưa chọn đủ dữ liệu bắt buộc.
+Do not enable `Place Order` until all required information is valid.
 
-## 15. Order success
+## 15. Order Success and Post-Purchase
 
-Hiển thị:
+Show:
 
-- Icon thành công
-- Mã đơn
-- Số tiền
-- Phương thức thanh toán
-- Thời gian dự kiến
-- Theo dõi đơn
-- Tiếp tục mua sắm
+- Success state
+- Order number
+- Amount paid
+- Payment method
+- Estimated delivery
+- Track order
+- Continue shopping
 
-Sau 7 ngày kể từ khi giao thành công có thể kích hoạt luồng yêu cầu đánh giá.
+A review request may be triggered seven days after successful delivery. Keep the message optional and easy to dismiss.
 
-## 16. Review
+## 16. Reviews
 
-- Rating tổng
-- Phân bổ sao
-- Filter theo loại da hoặc shade
-- Ảnh từ người mua
-- Tag `Đã mua hàng`
-- Report review
+Recommended content:
 
-Form đánh giá gồm rating, nội dung, ảnh, loại da và shade đã mua nếu phù hợp.
+- Average rating
+- Rating distribution
+- Filters by skin type or shade
+- Buyer images
+- Verified purchase label
+- Report action
+
+Review form may include rating, text, images, skin type, and purchased shade.
 
 ## 17. Loyalty
 
-Màn hình thành viên gồm:
+Member screen may include:
 
-- Hạng thành viên
-- Điểm hiện tại
-- Tiến độ lên hạng
-- Voucher
-- Lịch sử điểm
-- Quyền lợi
+- Membership tier
+- Current points
+- Tier progress
+- Available vouchers
+- Point history
+- Benefits
 
-Không làm gamification quá phức tạp.
+Keep gamification simple and clearly connected to real rewards.
 
 ## 18. Motion
 
-- Product card press: scale 0.98.
-- Add to cart: feedback ngắn 200–250ms.
-- Shade change: crossfade ảnh.
-- Bottom sheet: slide up 240–300ms.
-- Success: animation một lần, không lặp vô hạn.
+- Product card press: subtle scale to 0.98.
+- Add to cart feedback: 200–250ms.
+- Shade change: crossfade product image.
+- Bottom sheet: slide up in 240–300ms.
+- Success animation: play once, never loop indefinitely.
 
-## 19. Beauty API mapping
-
-Ví dụ product:
+## 19. Beauty Product Data Model
 
 ```json
 {
@@ -372,21 +378,14 @@ Ví dụ product:
 }
 ```
 
-## 20. Beauty design checklist
+## 20. Definition of Done
 
-- [ ] Hero rõ CTA và không che mặt người mẫu.
-- [ ] Product card ưu tiên ảnh và giá.
-- [ ] Shade có tên text.
-- [ ] Thành phần hiển thị rõ, không gây hiểu nhầm.
-- [ ] Có trạng thái hết hàng.
-- [ ] Sticky CTA không bị che bởi Zalo safe area.
-- [ ] AI feature có consent và disclaimer.
-- [ ] Luồng checkout không quá dài.
-- [ ] Nội dung có thể cấu hình từ backend.
-- [ ] Màn hình hoạt động tốt từ 320px.
+A beauty screen is complete when it:
 
-## 21. Prompt cho AI coding agent
-
-```text
-Build a premium beauty ecommerce Zalo Mini App using the shared design foundations and this beauty guideline. Use backend-driven sections, reusable components, soft luxury styling, large product photography, clear pricing, accessible shade selectors, sticky commerce actions, complete loading and error states, and Zalo-safe mobile spacing. Do not copy native iOS chrome. Do not hardcode banners, categories, products, theme colors, or section order. Implement and test the complete customer flow from home to product detail, cart, checkout, order success, order tracking, review, and repurchase.
-```
+- Uses shared tokens and approved beauty extensions.
+- Works at 320px width.
+- Supports missing images, long names, and unavailable shades.
+- Includes loading, empty, error, and retry states.
+- Avoids unverified medical claims.
+- Respects consent and privacy for camera or image features.
+- Can render entirely from backend-provided data.
