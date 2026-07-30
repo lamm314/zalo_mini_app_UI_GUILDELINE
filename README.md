@@ -1,26 +1,31 @@
 # Zalo Mini App UI Guideline
 
-Bộ quy chuẩn thiết kế giao diện cho hệ thống Zalo Mini App đa ngành.
+A reusable, industry-specific UI and UX guideline for commerce-oriented Zalo Mini Apps.
 
-## Phạm vi hiện tại
+## Current Scope
 
-- [Beauty / Mỹ phẩm](docs/beauty/README.md)
-- [Fashion / Quần áo](docs/fashion/README.md)
-- [Nền tảng thiết kế dùng chung](docs/shared/FOUNDATIONS.md)
+- [Shared Design Foundations](docs/shared/FOUNDATIONS.md)
+- [Beauty](docs/beauty/README.md)
+- [Fashion](docs/fashion/README.md)
 
-## Mục tiêu
+## Purpose
 
-Repository này là nguồn chuẩn để Designer, Product Owner, Frontend Developer và AI coding agent cùng triển khai giao diện nhất quán. Mỗi ngành có thể thay đổi màu sắc, nội dung, mô hình danh mục và các luồng nghiệp vụ đặc thù, nhưng vẫn dùng chung nền tảng về khoảng cách, khả năng chạm, trạng thái giao diện, accessibility và cấu trúc dữ liệu động.
+This repository is the single source of truth for product designers, product owners, frontend developers, backend developers, QA teams, and AI coding agents building Zalo Mini Apps.
 
-## Nguyên tắc sử dụng
+Each industry may define its own visual language, catalog model, content hierarchy, filters, product variants, and business flows. However, all implementations must share the same foundations for spacing, touch targets, accessibility, interaction states, responsive behavior, safe areas, and backend-driven rendering.
 
-1. Không sao chép nguyên giao diện iOS hoặc Android; giao diện phải phù hợp môi trường Zalo Mini App.
-2. Không hardcode nội dung trang chủ, banner, danh mục, màu chủ đạo hoặc thứ tự section.
-3. Mỗi màn hình phải có trạng thái loading, empty, error và retry.
-4. CTA chính phải dễ chạm bằng một tay và không bị che bởi thanh điều hướng hoặc safe area.
-5. Mọi thành phần mới phải ưu tiên tái sử dụng component và design token hiện có.
+## Core Rules
 
-## Cấu trúc đề xuất
+1. Do not copy iOS, Android, or desktop e-commerce interfaces literally. The experience must be designed for the Zalo Mini App environment.
+2. Do not hardcode home-page sections, banners, categories, theme colors, promotional blocks, or section order.
+3. Every data-driven screen must support loading, empty, error, retry, offline, and partial-data states.
+4. Primary actions must remain reachable with one hand and must never be hidden by the bottom navigation, keyboard, or device safe area.
+5. Reuse shared components and design tokens before creating industry-specific variants.
+6. Prices, discounts, inventory, delivery expectations, return policies, and order statuses must be explicit and trustworthy.
+7. Product imagery must be optimized for mobile bandwidth and progressive loading.
+8. All user-facing documentation, component specifications, design tokens, and AI prompts in this repository must be written in English.
+
+## Repository Structure
 
 ```text
 docs/
@@ -32,6 +37,25 @@ docs/
     └── README.md
 ```
 
-## Trạng thái
+## Recommended Implementation Model
 
-Phiên bản hiện tại là **v1.0**, tập trung vào hai ngành đầu tiên: Mỹ phẩm và Quần áo.
+The Mini App should behave as a presentation shell. Content, catalog data, banners, navigation, feature flags, layout configuration, and theme settings should be delivered by backend APIs.
+
+```text
+Admin Portal
+    ↓
+Backend API + Database
+    ↓
+Layout Configuration + Catalog + User Data
+    ↓
+Zalo Mini App Renderer
+```
+
+## Status
+
+Version **1.0** currently covers two initial commerce categories:
+
+- Beauty and cosmetics
+- Fashion and apparel
+
+Additional industry guidelines should extend the shared foundations without redefining common interaction rules.
