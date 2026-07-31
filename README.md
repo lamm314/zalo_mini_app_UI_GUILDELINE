@@ -10,6 +10,7 @@ A reusable, industry-specific UI, UX, and administration guideline for commerce-
 - [Beauty Administration Features](docs/beauty/ADMIN-FEATURES.md)
 - [Fashion UI Guideline](docs/fashion/README.md)
 - [Fashion Administration Features](docs/fashion/ADMIN-FEATURES.md)
+- [Electrical & Home Appliances UI Guideline](docs/electrical-appliances/README.md)
 
 ## Purpose
 
@@ -41,9 +42,11 @@ docs/
 ├── beauty/
 │   ├── README.md
 │   └── ADMIN-FEATURES.md
-└── fashion/
-    ├── README.md
-    └── ADMIN-FEATURES.md
+├── fashion/
+│   ├── README.md
+│   └── ADMIN-FEATURES.md
+└── electrical-appliances/
+    └── README.md
 ```
 
 ## Recommended Implementation Model
@@ -67,15 +70,16 @@ Zalo Mini App Renderer
 Administration requirements are divided into two levels:
 
 1. **Shared administration foundation:** dashboard, products, orders, customers, promotions, content, notifications, reports, permissions, audit logs, imports, exports, Mini App configuration, and multi-tenant management.
-2. **Industry-specific extensions:** product attributes, operational workflows, analytics, and tools unique to Beauty, Fashion, or future categories.
+2. **Industry-specific extensions:** product attributes, operational workflows, analytics, and tools unique to Beauty, Fashion, Electrical & Home Appliances, or future categories.
 
 ## Status
 
-Version **1.1** currently covers two initial commerce categories:
+Version **1.2** currently covers three commerce categories:
 
 - Beauty and cosmetics
 - Fashion and apparel
+- Electrical and home appliances, with a primary focus on Midea air conditioners
 
-Both categories now include UI guidelines and administration feature specifications.
+Beauty and Fashion include UI guidelines and administration feature specifications. Electrical and Home Appliances currently includes a detailed Mini App UI and UX guideline adapted to Huayue Supply Chain's quotation, delivery, installation, warranty, and after-sales workflows.
 
 Additional industry guidelines should extend both the shared design foundations and the shared administration foundation without redefining common rules.
