@@ -1,0 +1,51 @@
+id,name,category,image_sheet
+001,Xi măng PCB40,Xi măng,product-catalog-50.svg
+002,Xi măng PCB30,Xi măng,product-catalog-50.svg
+003,Xi măng trắng,Xi măng,product-catalog-50.svg
+004,Xi măng xây tô,Xi măng,product-catalog-50.svg
+005,Vữa khô trộn sẵn,Xi măng,product-catalog-50.svg
+006,Thép cuộn D6,Thép,product-catalog-50.svg
+007,Thép cây D10,Thép,product-catalog-50.svg
+008,Thép cây D12,Thép,product-catalog-50.svg
+009,Thép cây D16,Thép,product-catalog-50.svg
+010,Lưới thép hàn,Thép,product-catalog-50.svg
+011,Gạch đỏ 2 lỗ,Gạch,product-catalog-50.svg
+012,Gạch đỏ 4 lỗ,Gạch,product-catalog-50.svg
+013,Gạch đặc,Gạch,product-catalog-50.svg
+014,Gạch block,Gạch,product-catalog-50.svg
+015,Gạch bê tông khí,Gạch,product-catalog-50.svg
+016,Cát vàng,Cát đá,product-catalog-50.svg
+017,Cát đen,Cát đá,product-catalog-50.svg
+018,Đá 1x2,Cát đá,product-catalog-50.svg
+019,Đá 2x4,Cát đá,product-catalog-50.svg
+020,Sỏi xây dựng,Cát đá,product-catalog-50.svg
+021,Tôn lạnh,Mái lợp,product-catalog-50.svg
+022,Tôn màu,Mái lợp,product-catalog-50.svg
+023,Ngói đất nung,Mái lợp,product-catalog-50.svg
+024,Ngói màu,Mái lợp,product-catalog-50.svg
+025,Tấm lợp fibro,Mái lợp,product-catalog-50.svg
+026,Sơn nội thất,Sơn,product-catalog-50.svg
+027,Sơn ngoại thất,Sơn,product-catalog-50.svg
+028,Sơn chống thấm,Sơn,product-catalog-50.svg
+029,Sơn lót kháng kiềm,Sơn,product-catalog-50.svg
+030,Bột bả tường,Sơn,product-catalog-50.svg
+031,Ống PVC phi 21,Điện nước,product-catalog-50.svg
+032,Ống PVC phi 60,Điện nước,product-catalog-50.svg
+033,Ống PPR nóng lạnh,Điện nước,product-catalog-50.svg
+034,Dây điện 2.5mm,Điện nước,product-catalog-50.svg
+035,Cáp điện 4mm,Điện nước,product-catalog-50.svg
+036,Bồn cầu một khối,Thiết bị vệ sinh,product-catalog-50.svg
+037,Chậu lavabo,Thiết bị vệ sinh,product-catalog-50.svg
+038,Vòi sen nóng lạnh,Thiết bị vệ sinh,product-catalog-50.svg
+039,Vòi rửa lavabo,Thiết bị vệ sinh,product-catalog-50.svg
+040,Chậu rửa inox,Thiết bị vệ sinh,product-catalog-50.svg
+041,Gạch lát 60x60,Hoàn thiện,product-catalog-50.svg
+042,Gạch lát 80x80,Hoàn thiện,product-catalog-50.svg
+043,Gạch ốp 30x60,Hoàn thiện,product-catalog-50.svg
+044,Đá granite,Hoàn thiện,product-catalog-50.svg
+045,Đá marble,Hoàn thiện,product-catalog-50.svg
+046,Tấm thạch cao,Vật liệu phụ,product-catalog-50.svg
+047,Khung xương trần,Vật liệu phụ,product-catalog-50.svg
+048,Keo dán gạch,Vật liệu phụ,product-catalog-50.svg
+049,Phụ gia chống thấm,Vật liệu phụ,product-catalog-50.svg
+050,Lưới thủy tinh,Vật liệu phụ,product-catalog-50.svg
