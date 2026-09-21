@@ -4,6 +4,8 @@ Bộ tài liệu hướng dẫn thiết kế giao diện Zalo Mini App theo từ
 
 ## Danh mục guideline
 
+- [Phòng khám — Đặc tả Mini App + CRM: Nha khoa → Da liễu → Đa khoa](docs/clinic-crm-specs/README.md)
+
 - [Cynca VLXD — Vật liệu xây dựng](docs/cynca-vlxd/CYNCA_VLXD_UI_GUIDELINE.md)
 
 ## Tài nguyên Cynca VLXD
