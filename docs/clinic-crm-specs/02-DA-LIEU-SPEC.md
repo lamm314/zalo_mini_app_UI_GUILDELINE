@@ -1,6 +1,6 @@
 # 02 — Đặc tả Mini App + CRM phòng khám Da liễu
 
-> Phiên bản: 1.1 • Ngày: 2026-09-21 • Ngôn ngữ UI: tiếng Việt • Tiền tệ: VND • Múi giờ: Asia/Ho_Chi_Minh.
+> Phiên bản: 1.2 • Ngày: 2026-09-21 • Ngôn ngữ UI: tiếng Việt • Tiền tệ: VND • Múi giờ: Asia/Ho_Chi_Minh.
 > Đây là đặc tả sản phẩm và phần mềm cho bản demo có backend. Quy tắc chuyên môn, danh mục thuốc, nội dung tư vấn và biểu mẫu ký phải được người phụ trách chuyên môn cấu hình trước khi vận hành thực tế. Không xây tính năng tự chẩn đoán hoặc tự chọn thuốc/liều.
 
 ## 1. Mục tiêu, phạm vi và quyết định triển khai
@@ -84,7 +84,7 @@
 
 - Mini App tối ưu 360–430 px, điều hướng dưới: Trang chủ, Đặt lịch, Hồ sơ, Cá nhân. CRM sidebar 240 px, topbar có chi nhánh/ngày/tìm kiếm; desktop 1280–1440 px, tablet 768 px không mất hành động chính. Từng screen phải kiểm tra tại 375, 768 và 1440 px.
 - Nền sáng, primary cấu hình theo thương hiệu; dùng cùng token spacing 4/8/12/16/24/32, font hệ thống, chữ nội dung tối thiểu 14 px, vùng bấm tối thiểu 44 px. Trạng thái có nhãn và biểu tượng, không chỉ dùng màu.
-- Bảng: tìm kiếm debounce 300 ms, filter lưu vào URL, phân trang 25 mặc định/100 tối đa, sắp xếp ổn định theo thời gian rồi id. CSV theo đúng bộ lọc và quyền, chống công thức bắt đầu bằng =, +, -, @.
+- Bảng: tìm kiếm debounce 300 ms, filter phi nhạy cảm lưu vào URL, từ khóa tên/điện thoại chỉ giữ trong memory theo mục 6.2, phân trang 25 mặc định/100 tối đa, sắp xếp ổn định theo thời gian rồi id. CSV theo đúng bộ lọc và quyền, chống công thức bắt đầu bằng =, +, -, @.
 - Mọi màn hình có loading skeleton, empty state kèm CTA phù hợp, lỗi có mã request và thử lại, forbidden không lộ dữ liệu, xung đột phiên bản có tải lại/so sánh. Không bỏ dữ liệu form khi request lỗi.
 - Form có nhãn, required, lỗi ngay trường và summary; focus được lỗi bằng bàn phím. Chặn double-submit, có xác nhận riêng cho ký/hủy/hoàn tiền; ghi rõ tác động. Autosave bản nháp khám mỗi 10 giây khi thay đổi, hiển thị lần lưu; chưa lưu phải cảnh báo khi rời trang.
 - Thành công chỉ hiển thị sau API commit; cập nhật cache liên quan. Tải lại trang phải giữ trạng thái đã lưu. Khi offline chỉ cho xem cache không nhạy cảm; không queue offline đơn thuốc, thanh toán hoặc hồ sơ y tế.
@@ -240,7 +240,7 @@ Ký hiệu `*` là bắt buộc; mọi ID lấy từ API, không cho người d�
 | M16 `/privacy` | Consent hiện tại/lịch sử, mục đích chăm sóc, liên hệ, ảnh và marketing độc lập | Thu hồi từng phạm vi áp dụng cho xử lý/chia sẻ tương lai; tạo yêu cầu dữ liệu/xóa để quản lý xử lý theo chính sách; không tự xóa hồ sơ đã ký |
 | M17 `/care` | Nội dung chuyên khoa đã được chia sẻ, tiến độ, lịch kế tiếp | Hành động đặc thù ở mục 9; dữ liệu chỉ đọc trừ feedback/form được chỉ rõ |
 
-## 6. Đặc tả từng màn hình CRM dùng chung
+## 6. Đặc tả chức năng và thiết kế trang quản trị
 
 | ID / route | Dữ liệu và bố cục | Hành động / điều kiện |
 |---|---|---|
@@ -273,6 +273,379 @@ Ký hiệu `*` là bắt buộc; mọi ID lấy từ API, không cho người d�
 | C27 `/settings/users`, `/roles` | User, role, branch scope, care-team scope, active | Quyền riêng để cấp vai trò; không tự nâng quyền; revoke session khi khóa tài khoản |
 | C28 `/settings/integrations` | Provider, mode mock/live, trạng thái kết nối, outbox lỗi | Secret chỉ nhập, không trả về UI/log; test kết nối không gửi thông báo bệnh nhân; retry có dedupe |
 | C29 `/audit` | Actor, action, entity, time, outcome, request_id; metadata đã lọc | Read only, filter và export theo quyền; không có nút xóa/sửa audit |
+
+### 6.1 Phạm vi trang quản trị và cấu trúc điều hướng
+
+“Trang quản trị” trong tài liệu này là **toàn bộ hệ web dành cho nhân viên phòng khám**: vận hành CRM, khám chữa bệnh, kho, thu ngân, báo cáo, quản lý nội dung Mini App và cấu hình. Admin là một vai trò trong hệ, không phải tài khoản mặc nhiên được làm tất cả việc. Giao diện phải thay đổi theo quyền và phạm vi chi nhánh; bác sĩ vào workspace khám, lễ tân vào lịch/tiếp nhận, thu ngân vào thu tiền, quản lý vào dashboard. Không xây một trang dashboard tĩnh rồi coi phần quản trị đã hoàn tất.
+
+Nhóm sidebar và route chính:
+
+| Nhóm | Mục trong menu | Người sử dụng chủ yếu |
+|---|---|---|
+| Tổng quan | Dashboard, Việc của tôi | Tất cả staff theo widget/assignment được phép |
+| Tiếp nhận | Liên hệ, Bệnh nhân, Lịch hẹn, Hàng đợi | Tư vấn, lễ tân, bác sĩ |
+| Chuyên môn | Lượt khám, module chuyên khoa mục 6.5, Chỉ định, Kết quả, Đơn thuốc | Bác sĩ, điều dưỡng, kỹ thuật viên theo quyền |
+| Dược & kho | Cấp phát, Tồn kho, Nhập kho, Chuyển kho, Kiểm kê | Dược/kho, quản lý được cấp |
+| Tài chính | Hóa đơn, Thanh toán, Hoàn tiền, Ca thu ngân | Thu ngân, quản lý, auditor |
+| Chăm sóc | Công việc, Mẫu thông báo, Nhật ký gửi | Nhân viên chăm sóc và người được phân công |
+| Báo cáo | Vận hành, Tài chính, Kho, Chuyên khoa, Tệp xuất | Theo quyền báo cáo và quyền từng cột |
+| Mini App | Trang chủ & nội dung, Dịch vụ công khai, Bác sĩ công khai, Thư viện media, Nhận diện | Quản lý/nội dung được cấp quyền; không xem bệnh án qua CMS |
+| Cấu hình | Phòng khám/chi nhánh, Danh mục, Lịch làm việc, Biểu mẫu, Nhân sự & quyền, Tích hợp | Manager/admin theo permission riêng |
+| Kiểm soát | Nhật ký hoạt động | Auditor/người được cấp phạm vi audit |
+
+Bổ sung vào sitemap dưới `/crm`: `/encounters` (danh sách cho C10), `/dispenses` (hàng đợi cho C14), `/inventory/receipts`, `/inventory/transfers`, `/inventory/counts` (danh sách cho C16–C18), `/settings/clinic`, `/content/pages`, `/content/services`, `/content/doctors`, `/content/media`, `/settings/branding`, `/notifications/templates`, `/notifications/delivery`. Route list/detail dùng cùng permission với entity. Menu không có quyền được ẩn; truy cập URL trực tiếp vẫn kiểm ở server. Các chức năng P1 hiện “Chưa kết nối” đúng ngữ cảnh và không đẩy vào menu chính gây cảm giác đã hoạt động.
+
+### 6.2 Khung thiết kế quản trị và dashboard theo vai trò
+
+#### Khung desktop và responsive
+
+```text
+┌───────────────────────┬────────────────────────────────────────────────────┐
+│ Logo + tên clinic     │ Chi nhánh · ngày · tìm kiếm · việc của tôi · avatar│
+│                       ├────────────────────────────────────────────────────┤
+│ Nhóm menu             │ Breadcrumb                                        │
+│ Mục đang chọn         │ Tiêu đề + mô tả ngắn           [CTA chính]        │
+│ Nhãn số việc cần làm  │ Tabs / bộ lọc / tìm kiếm theo trang                │
+│                       ├────────────────────────────┬───────────────────────┤
+│                       │ Vùng dữ liệu chính         │ Chi tiết / task       │
+│                       │ Bảng, lịch hoặc workspace  │ Chỉ mở khi cần        │
+│                       ├────────────────────────────┴───────────────────────┤
+│ Hồ sơ / đăng xuất     │ Phân trang hoặc trạng thái lưu                    │
+└───────────────────────┴────────────────────────────────────────────────────┘
+```
+
+- Desktop ≥1280 px: sidebar 240 px, topbar 64 px, content padding 24 px, khoảng khối 24 px. Inspector đơn giản rộng 360–420 px; form nhiều dòng tiền/thuốc hoặc nhiều cột dùng full page. Drawer không ép vùng chính dưới 640 px: khi không đủ chuyển sheet phủ hoặc route detail. Không mở modal nằm trong modal.
+- 1024–1279 px: sidebar 72 px có tooltip/label khi mở; bảng ưu tiên các cột chính, cột ít dùng đưa vào detail. 768–1023 px: menu drawer, filter sheet, detail full page. <768 px: tối ưu xem lịch, liên hệ, task và detail cơ bản; biểu mẫu quản trị vẫn truy cập được bằng section xếp dọc, grid răng/ảnh/table phức tạp có vùng cuộn riêng và hướng dẫn mở rộng, không để toàn trang tràn ngang.
+- Topbar chỉ cho chọn chi nhánh được cấp. Đổi chi nhánh phải cảnh báo bản nháp chưa lưu, cập nhật query/cache có branch scope; không giữ selection bệnh nhân/chứng từ cũ để thao tác nhầm. “Tất cả chi nhánh” chỉ dùng màn aggregate có quyền; tạo/sửa luôn chỉ rõ một branch.
+- Tìm kiếm toàn cục nhóm Bệnh nhân/Lịch/Chứng từ trong phạm vi quyền; chỉ trả metadata tối thiểu, không tìm nội dung bệnh án/ảnh qua ô này. Từ khóa có tên/số điện thoại chỉ lưu trong memory; không đưa vào localStorage, analytics hoặc URL share. URL chỉ lưu filter phi nhạy cảm như status/date/branch/sort. Dùng `POST /search` để từ khóa không vào query-string log; hạ tầng vẫn redact body.
+- Sidebar badge là số việc cần xử lý thực, không phải số record toàn hệ. Header avatar cho xem role/scope hiện tại, đổi mật khẩu qua auth provider được cấu hình, đăng xuất; không có nút tự đổi vai trò ngoài demo role login đã tách tài khoản.
+- Page header: breadcrumb, tên trang, mô tả một dòng khi cần, một CTA chính và tối đa hai secondary action. Table screen có thanh filter riêng; trạng thái filter active và nút xóa lọc luôn thấy. Footer bảng hiển thị “1–25 / N”, page size, previous/next; selection không tự kéo sang trang khác.
+- Sort/filter tại server; lựa chọn cột và density lưu preference UI không nhạy cảm theo user+clinic; không lưu row data. Sticky header, align-right tiền/số, ngày giờ cùng format. Empty view có hướng dẫn tạo đầu tiên; error từng widget không làm trống dashboard còn lại. Lỗi API trong form giữ dữ liệu và đưa focus tới lỗi.
+- Thiết kế dashboard gọn: tối đa 4 KPI trên một hàng desktop, mỗi card số chính + đơn vị + kỳ so sánh rõ, không sparkline giả. Dưới là vùng vận hành 8/12 và task 4/12; chart tối đa hai biểu đồ có câu hỏi cụ thể. Tablet 2 card/hàng, mobile 1–2 theo nội dung; chữ không bị thu nhỏ để cố nhét bốn card.
+
+#### Dashboard và CTA theo vai trò
+
+| Vai trò | Nội dung ưu tiên từ trên xuống | CTA/drilldown chính |
+|---|---|---|
+| Consultant | Lead chưa nhận/đến hạn, lead chờ phản hồi, lịch đã chuyển đổi | Nhận liên hệ → C04; tạo task; đặt lịch |
+| Receptionist | Lịch hôm nay theo status, bệnh nhân chờ, slot trống, lịch cần bố trí lại | Tạo lịch, Check-in; mở calendar/queue giữ filter ngày/branch |
+| Doctor | Các lượt được giao, chờ kết quả/chờ ký, lịch tới, module chuyên khoa | Nhận khám/Mở hồ sơ/Ký sau review; không một nút ký hàng loạt |
+| Nurse/technician | Hàng đợi thực hiện, checklist còn thiếu, kết quả cần bổ sung | Nhận việc, nhập đo đạc/kết quả; không CTA kê đơn |
+| Pharmacist | Đơn chưa cấp đủ, lô sắp hết hạn, tồn thấp, chứng từ nháp | Cấp phát/Mở phiếu nhập/kiểm tra lô |
+| Cashier | Hóa đơn cần thu, khoản chờ đối soát, hoàn đã duyệt, ca đang mở | Thu tiền/Mở invoice/Đóng ca |
+| Manager | Lịch và hiệu suất, thực thu/công nợ, task chậm, KPI chuyên khoa | Drilldown tổng hợp; phê duyệt đúng permission, không mở toàn bệnh án |
+| Admin | Tài khoản bị khóa, cấu hình chưa hoàn thiện, trạng thái tích hợp, publish nội dung lỗi | Quản lý người dùng/tích hợp/cấu hình; không KPI bệnh án mặc định |
+| Auditor | Sự kiện trong scope, thay đổi quyền, chứng từ bù/đảo, export audit | Mở timeline đã lọc, xem liên kết bằng chứng được phép |
+
+Widget thiếu quyền không render và API không trả số bị ẩn. Bảng điều khiển quản lý không tự suy rằng admin được xem tiền/bệnh án. “Số liệu cập nhật lúc …” hiện theo timezone branch; refresh chỉ invalidates queries hợp lệ. Formula và định nghĩa cohort dùng mục 13, không tạo công thức khác cho dashboard đẹp hơn.
+
+### 6.3 Đặc tả thao tác và thiết kế chi tiết C01–C29
+
+Bảng mục 6 là danh mục màn hình; mô tả dưới đây là hợp đồng UX bắt buộc bổ sung. Mỗi màn phải có permission check, loading/empty/error, route hoạt động và dữ liệu API persisted. Tên cột có thể rút gọn trên màn hẹp nhưng trường trong detail vẫn đầy đủ.
+
+#### C01 — Đăng nhập nhân viên
+
+- Desktop dùng bố cục 40% nhận diện clinic/ảnh không gian, 60% form tối đa 420 px; tablet/mobile chỉ header thương hiệu và form. Nhãn môi trường DEMO luôn rõ, không hiển thị danh sách staff thật để chọn nhanh.
+- Trường email, password, hiện/ẩn password; nút Đăng nhập; lỗi không xác nhận tài khoản tồn tại. Sau login điều hướng dashboard đúng role, khôi phục URL trước đó chỉ nếu còn quyền. Loading khóa submit, rate limit có thời gian thử lại.
+- Quên mật khẩu chỉ hiện khi auth provider có reset flow thực; demo cung cấp hướng dẫn dùng tài khoản seed. Không thêm nút reset giả. Session hết hạn mở đăng nhập lại, draft nhạy cảm chỉ giữ trong memory phiên tab khi phù hợp, không lưu bản nháp ra browser storage.
+
+#### C02 — Dashboard
+
+- Header greeting ngắn, ngày làm việc, branch; filter kỳ thời gian chỉ tác động KPI/report, bảng “Hôm nay” có nhãn riêng để không nhầm kỳ.
+- Mỗi widget hiển thị title, unit, nguồn dữ liệu/quy tắc trong tooltip hoặc info panel, empty/error riêng. Card mở list có cùng filter và breadcrumb quay lại. Layout đúng role mục 6.2 và chuyên khoa mục 6.5.
+- Chỉ số so sánh hiển thị “So với kỳ trước tương ứng”; mẫu số không có thì N/A, không vẽ +100%. Nội dung cần xử lý có owner/due_at và hành động trực tiếp, không chỉ một con số.
+
+#### C03 — Danh sách liên hệ
+
+- Header “Liên hệ” + Tạo liên hệ; tabs Tất cả/Chưa nhận/Của tôi/Quá hạn. Bộ lọc nguồn, dịch vụ, owner, status, ngày tạo; search tên/phone theo cơ chế không ghi URL ở mục 6.2.
+- Bảng: mã, họ tên, số mask, nhu cầu tóm tắt, nguồn, dịch vụ, trạng thái, phụ trách, hẹn xử lý, ngày tạo. Mở hàng vào C04; nút gọi chỉ hiện nếu có quyền xem số. Kanban nhóm theo status, card có tên/nguồn/owner/due, badge quá hạn; chuyển card phải qua guard và dialog khi thiếu reason/owner.
+- Bulk assign chọn tối đa 100 record hiển thị được phép, preview danh sách và owner mới. API trả từng record succeeded/failed với reason; UI không báo tất cả thành công khi lỗi một phần, không tự retry những record đã assign thành công.
+
+#### C04 — Chi tiết liên hệ
+
+- Header tên/mã/status và owner; cột trái 30% thông tin liên hệ/nguồn/consent, giữa 45% timeline, phải 25% hành động tiếp theo/hồ sơ gợi ý. Tablet chuyển thành tab Thông tin/Hoạt động/Công việc.
+- Timeline phân loại note/cuộc gọi/đổi trạng thái/lịch hẹn, tác giả+thời gian; note có label “Nội bộ”. Form thêm note gồm body, loại, kết quả liên hệ, due_at/owner cho follow-up. Giữ revision nếu sửa.
+- Nhận xử lý, ghi đã liên hệ, chờ phản hồi, đặt lịch, link bệnh nhân, đóng lost. Link mở drawer tìm và đối chiếu tên/DOB/phone, không auto match. Converted chỉ sau lịch confirmed; hoạt động không thể đổi giữ action disabled có lý do, không ép đi tắt pipeline.
+
+#### C05 — Danh sách bệnh nhân
+
+- Header Tạo hồ sơ; filter branch, trạng thái, lần khám, bác sĩ theo scope. Cột mã, tên, DOB/tuổi hiển thị, phone mask, lần khám cuối, lịch kế, trạng thái; không đưa chẩn đoán nhạy cảm lên list mặc định.
+- Tạo hồ sơ mở drawer 560–640 px có định danh/liên hệ/đại diện; show duplicate suggestions ngay khi đủ thông tin. Chọn hồ sơ nghi trùng chỉ mở preview, không merge tự động.
+- Merge dùng wizard: chọn source/target → xem records và link quyền bị ảnh hưởng → xác minh/điền reason → manager có quyền xác nhận. Không preselect “Chuyển toàn bộ quyền đại diện”. Không có hard delete cho hồ sơ đã phát sinh.
+
+#### C06 — Hồ sơ bệnh nhân 360 độ
+
+- Header sticky có tên, mã, DOB, branch và dị ứng theo quyền; avatar nhỏ, không hero lớn. Quick actions Đặt lịch/Tạo lượt theo workflow/Nhận việc tùy role; timeline và tab giữ patient context khi chuyển.
+- Tab Thông tin: nhân khẩu và nguồn xác minh; Tiền sử: condition/allergy/source/review time; Lượt khám: ngày/bác sĩ/status; Đơn: signed/void và cấp phát; Lịch: sắp tới/đã qua; Tệp: loại/version/released; Chi phí: billed/paid/due; Đồng ý: purpose, version, scope, guardian. Tab chuyên khoa theo mục 6.5.
+- Summary không copy nội dung nhạy cảm sang tab không có quyền. Mỗi attachment có người tải, lần kiểm tra, scope; release exact version là action riêng. Lịch sử thay đổi nhân khẩu khác lịch sử signed clinical revision; UI giải thích bản hiện tại và bản cũ.
+
+#### C07 — Lịch hẹn
+
+- Toolbar Hôm nay/Trước/Sau, ngày/tuần, doctor/resource, branch/service/status. Calendar block có giờ, mã/tên theo quyền, dịch vụ, status và biểu tượng tài nguyên; tooltip không che slot đang thao tác.
+- Click slot trống mở form patient/service/doctor/resources/start/end/need; chọn service điền duration từ catalog. Click event mở inspector preview, link chi tiết C08. Requested hiển thị layer/list chờ xác nhận, không tô như slot đã được giữ.
+- Kéo đổi giờ luôn preview giờ cũ/mới và confirm; 409 trả block về vị trí cũ và giữ dialog đề xuất. Block nghỉ/bảo trì có kiểu hatch/label riêng. Có list/agenda tương đương để thao tác không phụ thuộc kéo thả.
+
+#### C08 — Chi tiết lịch hẹn
+
+- Header mã và status, thẻ patient/doctor/service, card ngày giờ/cơ sở/phòng, nhắc lịch và timeline thay đổi. Form confirm yêu cầu patient đã xác minh, doctor và đủ resources.
+- Confirm/Check-in/Đổi lịch/Hủy/Không đến chỉ hiện theo trạng thái và quyền. Cancel reason bắt buộc, preview ảnh hưởng task/reminder; no-show có gate thời gian. Check-in thành công mở encounter/visit tương ứng, retry không tạo thêm lượt.
+- Đổi dịch vụ/thời lượng cũng là reschedule cần recheck resources; lịch đã bắt đầu không cho “sửa giờ” qua edit field. Banner khi lịch bị ảnh hưởng bởi ca bác sĩ đổi phải có owner xử lý.
+
+#### C09 — Hàng đợi
+
+- Tách lanes Đang chờ/Đã gọi/Đang phục vụ, filter khoa/phòng/bác sĩ/priority; list có mã, giờ hẹn/check-in, thời gian chờ, người phụ trách. Các timer dùng timestamp server, không tự reset khi refresh.
+- Nhận khám có dialog xác nhận đúng patient; chuyển phòng chọn target, assignee, reason. Không thêm một ticket active thứ hai qua double click. Priority cần nhãn+reason, không chỉ màu.
+- Màn trình chiếu phòng chờ là projection riêng chỉ mã lượt/phòng/trạng thái, không đưa bảng nội bộ ra public bằng cách ẩn vài cột trong CSS.
+
+#### C10 — Lượt khám và workspace bác sĩ
+
+- List `/encounters` theo bác sĩ/ngày/status; detail có header patient 2 định danh, dị ứng, trạng thái lưu; tab Khám/Chuyên khoa/Chỉ định/Đơn/Kết luận/Chi phí theo permission.
+- Khối khám hiển thị form phiên bản dùng cho encounter, nháp autosave 10 giây, “Đã lưu lúc …”, lỗi lưu và retry; form nhiều trường chia section có progress required. Nội dung dài dùng workspace trung tâm, sidebar timeline và dữ liệu gần nhất theo scope.
+- Footer hành động Lưu nháp/Kiểm tra trước ký/Ký; dialog ký liệt kê trường thiếu, allergies review, pending order/defer reason, signer và patient. Signed chuyển read-only với CTA Tạo bổ sung; release/complete là hành động riêng, không dùng một nút “Lưu” vừa ký vừa gửi cho bệnh nhân.
+
+#### C11 — Chỉ định
+
+- List cột order code, patient/encounter, dịch vụ, loại/bộ phận, người yêu cầu, status, priority, due_at; filter cần nhận/đang làm/quá hạn. Detail gồm yêu cầu, chuẩn bị, assignment, kết quả, charge link và history.
+- Tạo chỉ định từ encounter đã đủ context; chọn catalog, priority, bộ phận, due_at. Bác sĩ ký → order và charge theo trigger; nhân viên được phân công nhận/bắt đầu/hoàn tất theo loại.
+- Hủy có reason và preview đã thu/đã thực hiện; sau thu chỉ tạo credit request theo quy tắc, không tự refund. Không gộp order của nhiều bệnh nhân vào cùng record khi bulk filter.
+
+#### C12 — Nhập và xác nhận kết quả
+
+- Header định danh/order/specimen nếu có; vùng giữa các giá trị/unit/reference/nội dung/file, panel phải người nhập/người review/version. Preview PDF/ảnh không phủ form; giữ tab dữ liệu khi tải ảnh lỗi.
+- Draft → Gửi kiểm tra → Xác nhận; role kỹ thuật viên chỉ submit, verifier mới verify. Highlight trường thiếu, attachment chưa scan và wrong patient; không mặc định cờ normal.
+- Result verified read-only, amendment tạo revision có reason và diff quyền phù hợp. Banner “Chưa chia sẻ với bệnh nhân” tới khi release; link tệp/dowload tôn trọng version và scope.
+
+#### C13 — Đơn thuốc
+
+- List theo ngày/bác sĩ/status/cấp phát; form prescription có patient/encounter, allergies review và bảng dòng thuốc. Cột tên+dạng+hàm lượng, liều text, đường dùng, tần suất, số ngày/reason, SL, đơn vị, hướng dẫn; không gom cách dùng vào một field mơ hồ.
+- Dòng thêm/sửa mở expanded row hoặc sheet; chọn thuốc từ catalog, không lấy giá/kho để tự quyết định thuốc. Panel tổng kết hiển thị số dòng và thông tin cần review, không dùng “gợi ý liều” tự sinh.
+- Kiểm tra trước ký có toàn văn đơn và signer; signed lock; void reason và cảnh báo nếu đã cấp. PDF preview watermark demo; chữ cách dùng không cắt khi in.
+
+#### C14 — Hàng đợi và xác nhận cấp phát
+
+- `/dispenses` mở danh sách đơn signed chưa cấp đủ; detail chia trái đơn/remaining, phải chọn lô/quantity; summary phiếu hiện tổng lượng và giá bán theo snapshot khi có quyền.
+- Bảng lô: mã, hạn, kho, khả dụng, FEFO gợi ý, lượng cấp. Quantity theo base unit, chọn khác lô gợi ý cần reason. Thiếu một dòng cho partial rõ ràng, không tự bù bằng thuốc khác.
+- Post dialog patient+đơn+lô+SL, transaction và idempotency. 409 stock giữ lựa chọn nhưng refresh available; chỉ hiện phiếu thành công sau commit. Reversal/return mở chứng từ riêng và quarantine, không xóa phiếu gốc.
+
+#### C15 — Tổng quan kho và SKU
+
+- Summary tồn thấp/gần hạn/hết hạn, filter warehouse/kind/status; bảng SKU, tên, base unit, on_hand, reserved, available, reorder point. Link số tồn mở ledger theo chính SKU/kho; tổng không cộng lô unavailable vào available.
+- Detail tabs Thông tin/Lô/Tồn theo kho/Lịch sử/Danh mục quy đổi. Lô có physical status+expiry flag tách nhau; ledger cột ngày, loại, nguồn, tăng/giảm, số dư và người post.
+- Catalog edit không có input “Sửa tồn”; thay giá/quy đổi tạo version, cảnh báo ảnh hưởng chứng từ mới; archive ngừng chọn mới nhưng hồ sơ cũ còn nguyên.
+
+#### C16 — Nhập kho
+
+- List phiếu theo ngày/kho/nhà cung cấp/status; full-page editor header mã chứng từ ngoài, ngày, kho, nhà cung cấp; bảng SKU/lô/expiry/SL/đơn vị/giá vốn và tổng.
+- Save draft cho phép chưa đủ dữ liệu; Post kiểm toàn bộ required, duplicate reference và lot; preview trước ghi kho. Dòng lỗi có row index và giữ những dòng đã nhập, không bỏ cả form.
+- Sau post readonly, thanh action In/Xem ledger/Tạo đảo có permission. Thông báo nhập thành công ghi movement IDs để đối soát; retry không nhân tồn.
+
+#### C17 — Chuyển kho
+
+- Wizard Kho đi/đến → Chọn item/lô/SL → Kiểm tra → Gửi; kho đi khác đến, cùng clinic, quyền cả hai đầu theo vai trò. List tách Đang soạn/Đang chuyển/Chờ nhận/Hoàn tất.
+- Detail có timeline draft/shipped/received, cột gửi/nhận/chênh. Shipped hiển thị in_transit, chưa available tại kho đến. Receive cho nhập actual_received và reason khi lệch.
+- Receive partial để lại số còn chờ/incident, không tự đóng chứng từ nếu chưa giải quyết. Hủy chỉ trước ship, hoàn luồng sau ship qua chứng từ xử lý riêng đã được duyệt.
+
+#### C18 — Kiểm kê
+
+- Full-page: kho/phạm vi lô, snapshot_at, người đếm; bảng book_quantity/count/delta/reason. Hiển thị trạng thái Đang đếm/Chờ duyệt/Đã ghi nhận, mapped tới count/adjustment workflow.
+- Snapshot mới không ghi đè lần đếm; movement phát sinh sau snapshot hiển thị “Cần đối chiếu lại”, bắt recount/reconcile trước post. Chênh lệch nonzero bắt reason và manager approve.
+- Post adjustment transaction theo phạm vi, audit before/after totals; không sửa trực tiếp InventoryLot balance. Bản post khóa, correction bằng adjustment mới.
+
+#### C19 — Billing và hóa đơn
+
+- Billing list tabs Chưa lập hóa đơn/Chờ thu/Thu một phần/Đã thu/Cần hoàn; bộ lọc ngày theo issued/settled có label riêng, branch/patient/method/status. Cột invoice number, patient, billed, credit, allocated, due/refundable, status.
+- Invoice editor full page: patient+visit/encounter, bảng charge nguồn, qty/price/discount/tax/total; panel tổng hợp sticky rộng khoảng 320 px desktop, xuống cuối trên tablet. Click nguồn về đúng procedure/order/dispense với quyền hiện tại.
+- Draft chọn charge; Issue kiểm duplicate claim và giá server. Discount yêu cầu manager review; invoice issued không còn editable row. Payment/credit/refund là chứng từ liên kết riêng; unpaid khác pending payment, “Cần hoàn” không bị che bằng nhãn đã thu.
+
+#### C20 — Thu tiền và hoàn tiền
+
+- Phiếu thu dialog 560–640 px cho giao dịch đơn giản; full-page khi allocation nhiều invoice. Trường patient, amount, method, invoice allocations, cash session/provider ref theo loại; summary còn nợ/cọc dư không âm.
+- Nút “Xác nhận đã nhận tiền mặt” chỉ cashier có ca open; giao dịch gateway hiển thị chờ server callback. Pending/failed có action kiểm tra trạng thái/retry phù hợp, không cho client tự mark settled.
+- Refund detail gồm payment gốc, credit liên quan, số eligible, amount/reason, requested_by/approved_by/executed_by và timeline. Manager approve khác cashier execute; over-amount/role/state sai chặn ngay ở API và hiển thị nguyên nhân. In phiếu không thay trạng thái thu/hoàn.
+
+#### C21 — Ca thu ngân
+
+- Header quầy/cashier/trạng thái và thời điểm mở; summary đầu ca+thu cash−hoàn cash=kỳ vọng. Bảng giao dịch linked phiếu, loại, amount, timestamp; bank/gateway chỉ ở section đối soát khác.
+- Open nhập opening cash; Close nhập cash kiểm đếm, variance tự tính, reason nếu lệch; preview before confirm. Một user/quầy không hai ca open; refresh không đổi số đầu ca.
+- Ca closed readonly, correction bằng quy trình duyệt/chứng từ kỳ sau đúng rule, không có nút sửa tổng để khớp số đếm.
+
+#### C22 — Công việc chăm sóc
+
+- Tabs Của tôi/Đến hạn/Quá hạn/Hoàn thành; bảng task type, subject, owner, due_at, priority, status, kết quả; list và Kanban theo workflow cho phép. Task card không lộ chẩn đoán qua title ở người không có quyền.
+- Create chọn subject được phép, loại, owner/due bắt buộc, note; done bắt result ngắn, cancel bắt reason. Liên hệ ngoài app do nhân viên thực hiện và ghi nhận kết quả; nút call không giả rằng đã gọi thành công.
+- Task do lỗi reminder/result chậm có link nguồn và retry state; complete task không tự complete encounter/refund hoặc đánh dấu provider delivered.
+
+#### C23 — Báo cáo và tệp xuất
+
+- Catalog report theo Vận hành/Tài chính/Kho/Chuyên khoa; detail header period/branch/doctor/service, card tổng, chart và table drilldown. Có định nghĩa chỉ số ở info panel, date semantics và as_of rõ.
+- Apply filter tái chạy report, trạng thái đang tính không hiển thị dữ liệu kỳ cũ như kỳ mới. Export dùng filter snapshot; job list queued/running/completed/failed/expired, requested_by, row_count, created_at, download expiry.
+- Job failed có retry, completed có tải khi còn quyền; đổi quyền trong lúc job chạy/download phải chặn dữ liệu không còn quyền. Không có nút CSV export toàn bộ clinic cho mọi role.
+
+#### C24 — Danh mục nghiệp vụ
+
+- Tabs Dịch vụ/SKU/Bảng giá/Khoa/Phòng & tài nguyên/Nhà cung cấp; list code, name, active, effective dates, updated_by. Form theo loại: service duration/required resources/charge_trigger/billing_mode; item unit/lot/expiry/reorder; giá branch/time/tax.
+- Edit ghi revision và preview phần thay đổi; unique code, khoảng hiệu lực không overlap. Archive có số records đang tham chiếu và tác động chọn mới; không xóa FK hay đổi snapshot hồ sơ đã ký.
+- Danh mục điều trị/thuốc do người có chuyên môn được cấp approve; admin vận hành kỹ thuật không có quyền tự thay nội dung chuyên môn chỉ vì vào Settings.
+
+#### C25 — Ca làm việc và nguồn lực
+
+- Hai view tuần lặp và ngoại lệ theo ngày; cột doctor/resource, ca giờ, nghỉ/bảo trì, effective range. Drawer tạo ca, holiday/leave, khả năng thực hiện service; preview slot trước publish.
+- Khi sửa ca: bảng lịch confirmed bị ảnh hưởng với mã, giờ, doctor, patient tối thiểu; chọn người xử lý/reason, tạo task một lần mỗi affected appointment+schedule version. Không tự hủy lịch hoặc chuyển doctor không có consent cần thiết.
+- Form chặn end≤start, tài nguyên branch khác, active periods mâu thuẫn. Change preview không ghi DB; Save mới tạo version và audit.
+
+#### C26 — Biểu mẫu và nội dung đồng ý
+
+- List template theo Clinical form/Consent/Hướng dẫn, version/status/effective date. Editor ba vùng: danh sách field, canvas form, properties; whitelist text/textarea/number/date/select/checkbox và nhóm, không arbitrary script.
+- Field editor key, label, required, unit/options, validation phạm vi cấu hình; preview có dữ liệu giả và lỗi mẫu. Published template immutable; clone new revision để sửa. Form đang dùng trong encounter giữ version snapshot.
+- Publish clinical template cần `clinical.template.publish`; consent template cần quyền riêng và ghi mục đích. Thay required không retroactively làm mất validity hồ sơ cũ. Preview không tạo Consent thật hoặc ký hồ sơ.
+
+#### C27 — Nhân sự và phân quyền
+
+- User list tên/email/role/branch/active/lần đăng nhập; detail tabs Hồ sơ công việc/Vai trò & phạm vi/Phiên đăng nhập/Lịch sử. Quyền là ma trận nhóm action x role, có mô tả nghiệp vụ, default deny.
+- Cấp quyền wizard user → role → branch/assignment → preview quyền hiệu lực → xác nhận. Không checkbox “Toàn quyền” mặc định; chọn clinical read/sign phải có scope phù hợp. Role conflict approve/execute refund có thông báo, server vẫn enforce phân tách actor.
+- Khóa user revoke sessions, reassignment task đang mở có preview; không âm thầm mất owner. Không cho khóa/thu hồi quản trị cuối cùng của clinic mà không có người thay thế đã có quyền. Thay avatar/tên bác sĩ công khai không đổi permission.
+
+#### C28 — Tích hợp
+
+- Card từng provider: Mock/Live, Connected/Disconnected/Error/Unconfigured, lần kiểm tra, queue lỗi; detail phần thông số không bí mật, trường secret write-only và log metadata đã lọc. Không trả lại secret để lấp input.
+- Save config, test kết nối an toàn, bật/tắt adapter có audit; switch live cần đủ cấu hình và người có quyền, không ảnh hưởng data demo thành tiền/tin thật một cách tự động. Test chỉ mock/test recipient được cấu hình, không chọn danh sách bệnh nhân để thử.
+- Event lỗi có request_id, attempt, next_retry và link task; retry idempotent không reset business state. Nội dung log không in raw token/webhook body chứa thông tin nhạy cảm.
+
+#### C29 — Nhật ký hoạt động
+
+- Filter actor/action/entity/outcome/date/branch; table time, actor+role thời điểm đó, action, entity code, outcome, reason và request_id. Detail drawer có metadata before/after được lọc, revision refs, nguồn tác động, linked document theo quyền.
+- Không có edit/delete; export audit có quyền riêng và expiry. Search audit không lôi raw clinical text vào response. Nếu quyền clinical không có, hiển thị entity ref thay nội dung revision.
+- Timeline cho giao dịch lớn nối confirm/sign/post/payment/refund/release bằng request/correlation IDs; bảo đảm staff có thể tìm chứng từ theo mã lỗi hỗ trợ mà không cần đọc log server.
+
+### 6.4 Quản trị Mini App, thương hiệu và thông báo — C30–C36
+
+Các màn này là P0 quản trị nội dung/cấu hình còn thiếu trong danh mục C01–C29, dùng cùng `/crm` và quyền server. CMS quản lý tài sản công khai; clinical attachments, prescriptions và patient Release vẫn thuộc module chuyên môn, không đi qua thư viện marketing.
+
+| ID / route | Bố cục & trường bắt buộc | Thao tác, tác động Mini App và guard |
+|---|---|---|
+| C30 `/settings/clinic` | Tabs Phòng khám/Chi nhánh/Liên hệ; tên hiển thị, logo reference, mô tả, địa chỉ, hotline, giờ tiếp đón, map link allowlist, active, timezone | Lưu nháp/preview/publish hồ sơ công khai; giờ tiếp đón không ghi đè lịch bác sĩ ở C25. Branch archive có preview lịch/task đang dùng; không xóa hồ sơ lịch sử |
+| C31 `/content/pages` | List page/key/status/version; editor ba vùng section list–mobile preview–properties. Home sections: hero, action shortcuts, services, doctors, next appointment slot, FAQ, contact. Field title/body/image/CTA label+target/order/visibility | Reorder bằng kéo hoặc nút Lên/Xuống; preview với profile giả; save draft, publish, unpublish, rollback version. Required navigation/booking identity guard không bị CMS gỡ. Nội dung cá nhân chỉ là data slot do API đúng quyền render, không editor copy data thật |
+| C32 `/content/services` | List linked service code, display title, category, excerpt, cover, duration/price read-only nguồn catalog, public status; editor nội dung mô tả/chuẩn bị/FAQ và thứ tự featured | Publication tách service.active. Publish chỉ khi service active, required content đủ và ảnh hợp lệ; đổi giá chỉ qua C24 có quyền. Clinical preparation text cần duyệt chuyên môn; không nội dung cam kết điều trị do editor tự tạo |
+| C33 `/content/doctors` | List practitioner link, public name, title, bio, portrait, specialty, branch, verified credentials, featured rank, public status | Không tạo user quyền bác sĩ từ CMS. Thông tin chứng chỉ/kinh nghiệm có verification_ref; chưa xác minh thì ẩn claim. Schedule/availability lấy từ C25/live API, không nhập slot giả vào bio. Unpublish profile phải revalidate/public booking theo eligibility ở mục 6.6 |
+| C34 `/content/media` | Grid/list tài sản brand theo type/tag/usage; drawer file name, dimensions, size, alt, license/source, owner scope, scan status, used_by | Upload jpg/png/webp hoặc SVG được sanitize/rasterize theo pipeline được chọn; không chấp nhận script; approve media mới được publish. P0 có thể chỉ jpg/png/webp để đơn giản. Archive chặn tài sản đang được published ref sử dụng hoặc yêu cầu replacement transaction; không chọn ảnh bệnh án làm hero |
+| C35 `/settings/branding` | Theme token form trái, preview Mini App/CRM phải; tabs Màu/Chữ/Shape/Bố cục/Logo; clinic profile version và fixture A/B chỉ demo | Edit whitelist tokens/variants; đo contrast, preview 375/768/1440, publish atomic theme version và invalidate cache; rollback published version. Không cho CSS/JS tự do; palette không override màu cảnh báo làm mất ý nghĩa |
+| C36 `/notifications/templates`, `/notifications/delivery` | Template editor key/channel/purpose/text/allowed variables/version; preview mock. Delivery table recipient mask/source/scheduled/version/status/attempts/last_error | Draft/review/publish template cho reminders giao dịch; xem lỗi/retry/cancel queued theo quyền. Không CTA gửi chiến dịch hàng loạt P0. Retry recheck consent, appointment schedule version, state và dedupe; provider delivered không do staff tự đánh dấu |
+
+C30–C36 có clear banner “Bản nháp — bệnh nhân chưa thấy” hoặc “Đang công khai — phiên bản …”. Preview desktop/mobile là tool cho staff, không nhân bản iframe có session patient thật. Sau publish cho xem link công khai và thời điểm áp dụng; nếu cache chưa cập nhật, hiển thị Publishing/Pending propagation với retry hợp lệ thay vì báo đã thay đổi toàn bộ tức thì.
+
+### 6.5 Chức năng và thiết kế quản trị riêng theo chuyên khoa
+
+#### Dashboard và menu Da liễu
+
+Dùng primary `#31564D`, sidebar sáng có active state sage, workspace `#FAF7F2`, thẻ trắng và border nhẹ. Gallery/ảnh clinical dùng nền neutral, không áp tint của theme lên ảnh. Trang quản trị giữ cảm giác nhẹ, chuyên nghiệp nhưng ngày/SL/tiền và trạng thái phải rõ như phần mềm vận hành.
+
+- Manager/receptionist: KPI Lịch hôm nay/Buổi đến hạn/Liệu trình cần phản hồi/Phản ánh mở; hàng chính là lịch phòng và thiết bị 8/12, task 4/12; vùng dưới là course tới lịch và task consent/nội dung cần review. Phản ánh chỉ metadata an toàn theo scope.
+- Doctor: các patient/lượt được giao, ảnh cần review, course đang pause và home care chờ ký. Thumbnail lâm sàng chỉ fetch khi clinical permission, không chỉ giấu bằng blur cho user thiếu quyền.
+- Menu riêng: Hồ sơ da, Body map, Ảnh lâm sàng, Liệu trình, Buổi thực hiện, Home care, Phản ánh sau điều trị. Ảnh lâm sàng và thư viện ảnh Mini App là hai menu/nguồn dữ liệu tách rõ.
+
+| Screen | Vùng nội dung và trường chi tiết | Thao tác & phản hồi cần thiết |
+|---|---|---|
+| S01 Hồ sơ da | Patient header, concern chips, tiền sử/sản phẩm đang dùng/source/review date; timeline review; section thông tin chưa rõ hiển thị Unknown | Thêm tự khai, clinician review, sửa draft; không auto biến sản phẩm đang dùng thành prescription. Bản ghi có nguồn được nhân viên phân biệt rõ với kết luận bác sĩ |
+| S02 Body map | Map trước/sau/detail ở trung tâm, danh sách lesion bên trái hoặc tab, inspector vùng/bên/tọa độ/morphology/onset/symptom/size/photo bên phải | Chọn vùng/marker bằng chuột hoặc list có keyboard; không AI auto label từ ảnh. Save đúng encounter+lesion_key; đổi view không làm mất marker. Map hẹp cho mở rộng khu vực thay thu nhỏ tới khó bấm |
+| S03 Thư viện ảnh lâm sàng | Header patient/context, filter vùng/bên/ngày/góc/consent; grid 3–4 cột desktop/2 tablet/1–2 mobile; thẻ có ngày/vùng/verification/release và placeholder lúc tải | Upload cần consent capture và owner đúng; verify metadata; chọn hai ảnh cùng patient để compare; consent revoked/chưa quyền không trả thumbnail. Selection tối đa hai cho compare, không bulk export ảnh mặc định |
+| S04 So sánh ảnh | Hai frame equal size, title trái/phải ngày/vùng/góc; controls zoom/pan/reset, annotation text nếu dùng chỉ metadata; panel thông tin điều kiện chụp | Side-by-side là mặc định, slider optional có keyboard equivalent; cảnh báo khác điều kiện. Không filter làm đẹp, không crop mất vùng gốc để tạo cảm giác hiệu quả. Close trở về filter gallery trước |
+| S05 Liệu trình | List code/patient/doctor/plan sessions/remaining/next_due/status/net billed/due theo quyền; detail header course revision, timeline sessions, entitlement ledger và bảng financial tách | Propose/accept/activate, schedule, pause/complete; sửa scope/giá tạo revision. Display ba số Đã lên lịch/Đã thực hiện/Còn quyền dùng riêng; no_show không làm giảm buổi mặc định; course paused vẫn thấy nợ |
+| S06 Buổi thực hiện | Patient/encounter/course header; checklist trước buổi bên trái, note/params/material usage giữa, resource+entitlement summary phải; sections consent/operator/supervisor/room/device/time/result | Start gate consent/checklist/tài nguyên; complete preview actual usage và consume=1; stopped ghi reason/usage và link adverse event nếu report. Không prefill thông số máy theo template thẩm mỹ chung |
+| S07 Phản ánh/sự cố | List case/onset/subject/assigned doctor/status/age/severity đã xác nhận; detail description, attachment private, action timeline và follow-up tasks | Report/acknowledge/review/resolve; operator report được nhưng doctor mới resolve. Resolve bắt action note; reopening tạo history. Pause course là quyết định riêng, không tự hoàn tiền khi tạo phản ánh |
+| S08 Home care | Header patient/encounter/version/status, tabs hướng dẫn và lịch sử; group Sáng/Tối/Khác với entry category/order/instruction/start/end/prescription ref | Sắp entry bằng nút/keyboard hoặc kéo; thuốc phải trỏ đơn signed, skincare/product không tự thành thuốc. Preview patient view, sign rồi release exact version; superseded hiện bản thay thế, giữ lịch sử |
+
+S09 là phần patient `/mini/care`; từ admin có **preview projection đúng quyền** bằng fixture hoặc hành động xem bản đã release, không impersonate bệnh nhân để bỏ qua policy. Preview public CMS không có quyền mở S09 clinical data.
+
+**Đường đi quản trị da liễu:** receptionist C08 → doctor C10/S01/S02 → S03 capture consent và ảnh → S05 course/giá → C19 invoice gói → S06 session/usage → S08 ký/release → theo dõi S07 nếu có. Khi quay từ invoice, course vẫn hiển thị số buổi theo ledger, không suy từ invoice balance.
+
+**Bảng điều khiển chuyên khoa:** progress theo session, list sắp hết quyền sử dụng/quá hạn khi có rule, ảnh đang chờ review và phản ánh assigned. Thông tin đời tư/ảnh không vào card của cashier/consultant. Chart doanh thu tách gói bán với giá trị buổi đã hoàn tất; cột Included/Standalone trên session charge giúp nhìn ra không thu hai lần.
+
+**Cấu hình riêng C24–C26:** loại phòng/thiết bị/bảo trì, course templates, checklist từng service, param keys/unit và consent version. Thiết bị có downtime không được chọn start; params chuyên môn không tự hardcode. C31–C35 dùng gallery thương hiệu/editorial trung tính theo hướng kem/sage, không tái sử dụng clinical before/after để quảng cáo.
+
+### 6.6 Hợp đồng dữ liệu, quyền và API bổ sung cho quản trị
+
+#### Dữ liệu nội dung và phiên bản
+
+- `ContentDocument`: id, clinic_id, branch_scope[], kind=clinic_page/home/service/doctor, key, source_entity_id?, revision_no, schema_version, draft_payload, state=draft/in_review/published/archived, authored_by, reviewed_by?, published_at?, version. `ContentRevision` immutable snapshot sau publish; unique clinic+kind+key+revision. `PublicationPointer` trỏ published revision và visibility, thay đổi atomically với audit/outbox; revision cũ không sửa.
+- `ContentSection`: stable id, type từ whitelist, order, title?, body?, media_id?, target_route?, data_slot?, visible; public URLs chỉ allowlist https, internal route whitelist và entity được publish. Validate không có script/raw HTML không sanitize; text rich content dùng AST/allowlist. Dynamic slot chỉ lưu key “my_next_appointment”, không lưu patient_id/appointment_id trong CMS content.
+- `BrandAsset`: id, clinic_id, kind=logo/portrait/hero/illustration, storage_key, mime, size, width/height, alt_text, source_url?, usage_license, verification_state, scan_state, public_approved_at?, archived_at?. Public derivatives chỉ từ tài sản brand đã duyệt; clinical Attachment nằm namespace/bucket/policy khác. Never chuyển type clinical → brand bằng PATCH.
+- `PublicationReview`: content_id, revision_no, reviewer_id, scope=editorial/clinical/credentials, decision=approved/rejected, reason?, reviewed_at. Sửa draft sau review làm review đó stale; phải review revision mới trước publish. Nội dung chuyên môn dùng `clinical.content.review`; credential dùng `practitioner.credentials.verify`; CMS editor không tự có các quyền này.
+- `StaffUIPreference`: user_id, clinic_id, table_key, column_order[], visible_columns[], density, default_view; không chứa patient/row/filter search nhạy cảm. Server intersect với allowed columns mỗi lần load, preference không mở quyền bị thu hồi.
+- `NotificationTemplateRevision`: key, channel, purpose, revision, body_template, allowed_variables[], state, reviewed_by?, published_at?; mỗi notification giữ revision snapshot. Không nhận arbitrary template expression thực thi code. `NotificationTemplateReview` lưu template_id, revision, reviewer_id, decision, reason?, reviewed_at; sửa body/variables làm review cũ stale. Template chỉ chứa thông báo giao dịch tối thiểu, không chèn chẩn đoán/đơn thuốc; nội dung hướng dẫn chuyên môn phải đi qua clinical review thích hợp. `ClinicBrandProfile` dùng schema mục 3.7, cùng version/audit/publish safeguards.
+
+#### Workflow publish và phạm vi quyền
+
+`draft → in_review → published`; `in_review → draft` khi yêu cầu sửa; published immutable. Sửa tạo draft revision mới. `unpublish` gỡ current public pointer, giữ revision để xem lịch sử; `rollback` tạo publication event mới trỏ revision đã duyệt, không xóa revision sau. Archived chỉ cho tài liệu không còn pointer/reference active. UI tách trạng thái draft/review của revision đang biên tập khỏi trạng thái công khai lấy từ PublicationPointer.visibility: một tài liệu có thể đang sửa draft trong khi revision trước vẫn công khai; sau unpublish hiển thị “Đã gỡ công khai”, lịch sử revision vẫn giữ published_at. Publish content và update index/cache event cùng transaction; response gồm `revision`, `publication_status`, `propagation_status`.
+
+Quyền bổ sung: `content.read`, `content.write`, `content.publish`, `brand.manage`, `clinic.profile.manage`, `media.read`, `media.upload`, `media.approve`, `notification.template.manage`, `notification.delivery.read`, `notification.retry`, `clinical.content.review`, `clinical.template.publish`, `practitioner.credentials.verify`, `staff.manage`, `role.manage`, `search.metadata`. Manager/admin chỉ nhận các permission được cấp trong seed/role matrix; admin kỹ thuật không có clinical review mặc định. Doctor được chỉ định review nội dung có quyền riêng; doctor đang khám không tự làm publisher website. Patient/guest chỉ GET published projection; preview cần staff auth/scope, không public bằng cách thêm `?preview=true`.
+
+Đối với endpoint vận hành ở mục 14, giữ nguyên state guard/actor/transaction; các giao diện C01–C29 không được bypass bằng CMS hoặc settings wildcard. Read-only report/search lấy dữ liệu đã scope ở query, không fetch toàn bộ rồi lọc ở frontend.
+
+| Method / endpoint sau `/api/v1` | Input / hành vi | Quyền & response |
+|---|---|---|
+| POST `/search` | q, allowed entity_types, branch_id, limit≤20 | search.metadata + quyền từng entity; metadata tối thiểu, không log từ khóa/raw body |
+| GET/PATCH `/me/ui-preferences/:key` | columns/order/density/view | Chỉ own user+clinic, validate whitelist và version |
+| POST `/leads/bulk-assign` | ids≤100, owner_id, expected_versions, Idempotency-Key | lead.assign theo từng row; result succeeded/failed list không PHI ngoài scope |
+| GET `/settings/clinic`; PATCH `/settings/clinic/draft` | public_profile fields, expected_version | clinic.profile.manage; operation profile publish qua content pipeline, operational branch/time config giữ API hiện hữu |
+| GET/POST `/content/documents`; GET/PATCH `/content/documents/:id` | filters hoặc kind/key/source_entity_id/draft_payload/schema_version/expected_version | content.read/write và branch scope; PATCH chỉ draft |
+| POST `/content/documents/:id/submit-review` | revision, expected_version | in_review, loại review theo fields/diff; không tự approve |
+| POST `/content/documents/:id/reviews` | revision, scope, decision, reason? | Quyền reviewer đúng loại; trả review gắn exact revision |
+| POST `/content/documents/:id/publish` | approved_revision, expected_version, Idempotency-Key | content.publish; validate review/asset/source eligibility; publication pointer + audit/outbox |
+| POST `/content/documents/:id/unpublish`; POST `/content/documents/:id/rollback` | reason, revision? để rollback, expected_version | content.publish; revision bất biến, invalidate public projection |
+| GET `/content/documents/:id/preview` | revision, viewport, fixture_id? chỉ demo | Staff auth + content.read; synthetic projection, không thêm quyền patient |
+| POST `/brand-assets/upload-intents`; POST `/brand-assets/:id/finalize` | mime/size/hash/source/license/alt hoặc upload_ref | media.upload; quarantine và verify file; không nhận clinical attachment_id |
+| GET `/brand-assets`; POST `/brand-assets/:id/approve`; POST `/brand-assets/:id/archive` | filter hoặc reason/expected_version | media.read (gán cùng content.read trong seed) / media.approve; archive guard used_by |
+| GET/PATCH `/settings/branding` | token/schema version/variants, expected_version | brand.manage; PATCH tạo draft, preview không publish |
+| POST `/settings/branding/publish`; POST `/settings/branding/rollback` | draft_version hoặc target_version, expected_version, reason? | brand.manage + content.publish; contrast/assets/variant validation server |
+| GET/POST `/notification-templates`; PATCH `/notification-templates/:id` | key/channel/purpose/body/variables/version | notification.template.manage; draft only |
+| POST `/notification-templates/:id/submit-review`; POST `/notification-templates/:id/reviews` | revision, expected_version hoặc decision/reason | notification.template.manage; in_review rồi approved/rejected, lưu reviewer; sửa draft làm review stale |
+| POST `/notification-templates/:id/preview`; POST `/notification-templates/:id/publish` | fixture payload hoặc approved revision | notification.template.manage; publish chỉ revision review approved, snapshot bất biến; preview không gửi, publish không tự queue tin |
+| GET `/notification-deliveries`; GET `/:id` | filters/source/status/date | notification.delivery.read + subject scope; recipient masked, nội dung giới hạn |
+| POST `/notification-deliveries/:id/retry`; POST `/:id/cancel` | expected_version, reason, Idempotency-Key | notification.retry; current state/consent/schedule check và audit |
+
+Danh sách/detail API cho C10/C14/C16–C18 dùng GET `/encounters`, `/dispenses`, `/inventory/receipts`, `/inventory/transfers`, `/inventory/counts` và GET `/:id` tương ứng; filter/pagination/field scope như endpoint core. API quản trị danh mục C24 sử dụng allowlist loại entity và quyền theo type, không cho tên bảng tùy ý.
+
+API mới có cùng error envelope/idempotency/version quy định mục 14. Publish thiếu review → `422 REVIEW_REQUIRED`; asset chưa hợp lệ → `422 ASSET_NOT_APPROVED`; stale revision → `409 VERSION_CONFLICT`; archive asset đang dùng → `409 ASSET_IN_USE`; role không đúng → `403`. Invalid theme/section → lỗi từng field. Không trả “thành công” rồi bỏ sự kiện publish hoặc ghi đè phiên bản khác.
+
+Public service đủ điều kiện khám phá/đặt lịch = service.active + public content published + branch active + doctor published/active/eligible (nếu chọn doctor cụ thể) + availability hợp lệ. Unpublish không hủy lịch cũ; lịch cũ vẫn xem trong patient/staff scope bằng snapshot và ID, nhưng không hiện như lựa chọn mới. Submit booking sau unpublish phải revalidate và trả lỗi lựa chọn đã thay đổi; không tạo request cho dịch vụ ngừng nhận. Đồng bộ display price từ version catalog, label giá tham khảo; CMS không tự thay giá billing.
+
+### 6.7 Kịch bản demo trang quản trị
+
+Seed bổ sung không phá số liệu happy path mục 9: 2 staff có quyền publisher/reviewer khác nhau, 1 CMS editor chỉ content.write, 1 profile bác sĩ công khai chưa xác minh claim, 1 nội dung draft, 1 published revision, 1 asset đang dùng, 1 asset quarantined, 1 notification failed và một fixture brand B. Các bản ghi gắn tag `admin_demo`, giao dịch kho/tiền scenario mới reset độc lập.
+
+1. **ADMIN-S01 — Ca lễ tân:** login → dashboard → lead new → assign/note → tạo/link patient → confirm lịch → check-in → chuyển workspace đúng chuyên khoa. Kiểm tra sidebar, filter/drilldown, patient context và quyền cashier/doctor không xuất hiện sai.
+2. **ADMIN-S02 — Cập nhật Mini App:** CMS editor sửa home hero/dịch vụ/doctor bio → preview với ảnh brand fixture → submit review → reviewer xác nhận phần cần quyền → publisher publish → mở Mini App phiên guest mới thấy revision mới. Nháp chưa publish vẫn không ảnh hưởng khách; rollback khôi phục revision cũ mà giữ audit.
+3. **ADMIN-S03 — Quản trị và phân quyền:** admin sửa branch scope của một staff → staff đang login refresh/request khác bị scope mới chi phối; thử đọc clinical photo không có quyền vẫn từ chối; preview CMS không mở clinical data. Kiểm tra audit có old/new field names và actor.
+4. **ADMIN-S04 — Sửa lỗi vận hành:** lọc stock thiếu/notification failed → mở entity gốc → xử lý đúng quyền; retry notification recheck lịch/consent. Payment pending và result pending vẫn còn trạng thái riêng, không bị task Done biến thành settled/verified.
+5. **ADMIN-S05 — Nhận diện clinic:** thay token/layout draft → kiểm contrast và ba viewport → publish → Mini App+CRM cùng version; chuyển demo fixture B thấy đổi composition mà permission/workflow giống nhau. Thử archive hero đang dùng bị chặn, thay asset rồi publish mới archive được.
+6. **ADMIN-S06 — Tính đúng của bảng:** lọc ngày/branch, tìm tên dài, 0/1/100 rows, sort, page, mở detail rồi quay lại; selection không vượt trang, search nhạy cảm không vào URL. Export đúng bộ lọc và quyền, lỗi một bulk item có feedback riêng.
+
+### 6.8 Acceptance criteria quản trị và đầu ra cho AI
+
+| ID | Given / When | Then |
+|---|---|---|
+| ADMIN-AC01 | Login bằng từng role trong seed | Landing/dashboard/menu/CTA đúng quyền; gọi API ẩn nút vẫn bị kiểm quyền |
+| ADMIN-AC02 | Xem dashboard theo ngày/branch, mở KPI | List drilldown cùng filter, giá trị khớp report, lỗi một widget không xóa widget khác |
+| ADMIN-AC03 | Table có filter/sort/page và mở detail/quay lại | Giữ filter phi nhạy cảm; search tên/phone không xuất hiện trong URL/storage/log; selection đúng trang |
+| ADMIN-AC04 | Bulk assign có một record không đủ quyền/stale | Thành công/lỗi từng record rõ; retry không ghi lại những record đã thành công |
+| ADMIN-AC05 | Chuyển chi nhánh khi form có draft | Cảnh báo/giữ draft hợp lệ, không gửi patient/document ID branch cũ vào mutation mới |
+| ADMIN-AC06 | Calendar drag gặp 409 hoặc form sai required | Event không mất lịch cũ; giữ input, chỉ rõ nguyên nhân, không fake success |
+| ADMIN-AC07 | Clinic staff mở C06/C10/C13 | Patient header đúng, nháp/signed/released khác nhau rõ, signed không sửa body bằng generic edit |
+| ADMIN-AC08 | Cấp thuốc/thu tiền/chuyển kho retry | Một nghiệp vụ ghi một lần theo source; UI phản ánh partial/pending/in_transit đúng |
+| ADMIN-AC09 | CMS draft mới được lưu nhưng chưa publish | Guest/Mini App vẫn xem revision cũ; preview chỉ staff đúng quyền và synthetic data |
+| ADMIN-AC10 | Publish thiếu review hoặc dùng asset quarantine | Server chặn field cụ thể; không đổi publication pointer |
+| ADMIN-AC11 | Publish/rollback hợp lệ | Revision mới/cũ hiển thị sau cache propagation có theo dõi; audit và lịch sử còn đủ |
+| ADMIN-AC12 | Unpublish doctor/service giữa xem slot và submit | New request bị revalidate; lịch cũ không bị xóa và vẫn xem theo scope |
+| ADMIN-AC13 | Staff thử dùng clinical Attachment làm hero | Server từ chối, ảnh lâm sàng không xuất hiện ở brand library/public URL |
+| ADMIN-AC14 | CMS editor sửa giá hoặc tạo doctor user quyền ký | Bị chặn; giá qua catalog, account/permission qua user module |
+| ADMIN-AC15 | Theme sửa màu/variant | Invalid schema/contrast bị chặn publish; preview và rollback hoạt động, không đổi warning semantics |
+| ADMIN-AC16 | Retry notification lịch đã hủy/consent thu hồi | Không gửi, ghi trạng thái/lý do; không có manual mark-delivered |
+| ADMIN-AC17 | Thu hồi quyền khi export đang chạy | Job/download recheck quyền; không phát tệp có dữ liệu scope cũ |
+| ADMIN-AC18 | Dùng bàn phím, 375/768/1440 và density khác nhau | Sidebar/table/drawer/CTA hoạt động, không chồng modal hoặc tràn toàn trang; text/contrast theo mục 3 |
+| ADMIN-AC19 | Chạy ADMIN-S01 và workspace chuyên khoa mục 6.5 | Chức năng và bố cục riêng hiện rõ, back navigation giữ context; đủ màn chuyên khoa được mô tả |
+| ADMIN-AC20 | Rà soát bàn giao quản trị | C01–C36 có screen/API/state/permission mapping, đủ ảnh QA/dashboard/table/form/specialty/CMS và không còn action giả |
+
+Agent thêm `docs/ADMIN-SCREEN-MATRIX.md`: mỗi screen ID → route → role/permission → component/layout → API/action → state/validation → test/scenario và screenshot. Tài liệu hướng dẫn thao tác `docs/ADMIN-GUIDE.md` có đường đi cho lễ tân, bác sĩ, dược, thu ngân, manager và CMS editor; ghi rõ trạng thái demo/live. Test meaningful tập trung permission, idempotency, publication isolation, propagation, rollback, ảnh clinical/public, và hành vi lỗi, không chỉ snapshot markup giống implementation. DoD yêu cầu ADMIN-AC01–20 cùng CORE/DESIGN/chuyên khoa pass; đây là yêu cầu cho giai đoạn code, không tuyên bố hiện đã có app quản trị chạy được.
 
 ## 7. Trường dữ liệu và validation dùng chung
 
@@ -787,10 +1160,12 @@ clinic-system/
     crm/src/
       app/                  layout, routing, session
       features/             leads, patients, calendar, encounters, specialty
+                            inventory, billing, reports, cms, branding, settings
       components/           patient-header, status-badge, data-table
     api/src/
       modules/              identity, crm, patients, scheduling, clinical
                             specialty, pharmacy, inventory, billing, reports
+                            content, brand-assets, publication, notification-templates
       policies/             role, ownership, clinic and branch scopes
       infrastructure/       database, files, adapters, audit
     worker/src/             outbox, reminders, exports, retries
@@ -812,6 +1187,8 @@ clinic-system/
     DESIGN-BRIEF.md          Art direction cho clinic, bố cục Mini App/CRM
     DESIGN-QA.md             Checklist DESIGN-AC, ảnh đối chiếu và kết quả
     design/                 screenshots, component gallery, asset manifest
+    ADMIN-SCREEN-MATRIX.md   C01–C36 và màn chuyên khoa: UI/API/quyền/test
+    ADMIN-GUIDE.md           Hướng dẫn vận hành theo vai trò và CMS
     API.md                  How to run/open generated OpenAPI
     DEMO.md                 Accounts, scripts and expected numbers
     DECISIONS.md            Implementation choices and differences from spec
@@ -832,7 +1209,7 @@ Trình tự bàn giao cho AI:
 2. Tạo project skeleton, schema/constraints, migrations, contracts, auth/policy và seed. Cung cấp `.env.example` chạy demo không cần tài khoản dịch vụ thật.
 3. Hoàn thành vertical slice M01→M07→C03/C04→C07/C08→C10 trước; dữ liệu persist thật. Thử từ hai phiên trình duyệt để chứng minh đồng bộ.
 4. Xây module chuyên khoa mục 9, đơn/cấp phát/kho/billing; transaction và lỗi có thông điệp UI. Mỗi màn hình có route thật và dữ liệu thực từ DB.
-5. Thêm release về Mini App, consent/guardian, báo cáo/audit và mock notifications. Không đưa quyền ký đơn/hoàn tiền vào nút demo bypass.
+5. Triển khai quản trị chi tiết mục 6: C01–C36, CMS/publish/brand, workspace chuyên khoa và ADMIN-SCREEN-MATRIX; thêm release về Mini App, consent/guardian, báo cáo/audit và mock notifications. Không đưa quyền ký đơn/hoàn tiền vào nút demo bypass.
 6. Chạy acceptance scenario, test đồng thời và phân quyền; sửa lỗi tới khi pass. Quay/chụp luồng demo tại ba kích thước và ghi số liệu đối soát.
 7. Bàn giao source, lockfile, migrations, seed/reset, OpenAPI, DEMO.md, OPERATIONS.md và kết quả test. Liệt kê P1 chưa kết nối bằng tên cụ thể, không ghi “đã hoàn thành” nếu chỉ là màn hình tĩnh.
 
@@ -875,7 +1252,7 @@ Các lệnh dự án cần cung cấp (agent có thể chọn runner khác nhưn
 | CORE-AC21 | Transfer shipped nhưng chưa received | Hàng ở in_transit, không available tại kho đến; receive/retry không nhân tồn |
 | CORE-AC22 | Đơn void sau đã cấp một phần | Không cấp thêm; vẫn thấy lần đã cấp và tiền/kho, không tự đảo ledger |
 | CORE-AC23 | Upload file sai MIME/quá size/chưa scan | Bị reject/quarantine; không cấp download URL; ảnh/PDF hợp lệ dùng đúng scope |
-| CORE-AC24 | Mọi role chạy scenario P0 và route đã liệt kê | Screen IDs M01–M17/C01–C29 và specialty có UI hoạt động; không dead-end không giải thích |
+| CORE-AC24 | Mọi role chạy scenario P0 và route đã liệt kê | Screen IDs M01–M17/C01–C36 và specialty có UI hoạt động; không dead-end không giải thích |
 
 ### 16.3 Test và Definition of Done
 
@@ -884,7 +1261,7 @@ Các lệnh dự án cần cung cấp (agent có thể chọn runner khác nhưn
 - E2E: happy path mục 9 + missing consent + unauthorized role + stock thiếu + partial pay/refund + retry và refresh. Chạy seed reset cho từng scenario số học; không assertion dựa vào thứ tự test trước.
 - UX QA: screenshots các screen trọng tâm home/booking/lead/patient/encounter/specialty/billing/report tại 375/768/1440; font không bị cắt, bảng scroll trong container, dialog focus đúng, status có nhãn, empty/error dùng được.
 - Performance target đề xuất cho demo trên môi trường được ghi rõ: 10.000 patients, 50.000 encounters, 20 staff đồng thời; API list p95 <800 ms, availability p95 <1s, report tháng <3s hoặc chuyển async. Đo bằng load script với dataset synthetic, không tuyên bố đạt nếu chưa chạy.
-- DoD: lint/typecheck/build pass; CORE-AC, chuyên khoa và DESIGN-AC01–10 pass; brief/theme/ảnh QA bàn giao đủ; OpenAPI khớp routes và payload; không credentials/PHI trong repo; demo reset/replay thành công; có hướng dẫn mở hai client; dashboard reconcile đúng số; limitations P1 ghi rõ. Không yêu cầu test tích hợp live nếu chưa có provider credentials, nhưng mock phải kiểm cả lỗi/retry.
+- DoD: lint/typecheck/build pass; CORE-AC, chuyên khoa, DESIGN-AC01–10 và ADMIN-AC01–20 pass; brief/theme/ảnh QA bàn giao đủ; OpenAPI khớp routes và payload; không credentials/PHI trong repo; demo reset/replay thành công; có hướng dẫn mở hai client; dashboard reconcile đúng số; limitations P1 ghi rõ. Không yêu cầu test tích hợp live nếu chưa có provider credentials, nhưng mock phải kiểm cả lỗi/retry.
 
 ## 17. Nguồn tham khảo và ranh giới áp dụng
 

@@ -1,6 +1,6 @@
 # Bộ đặc tả Mini App + CRM phòng khám
 
-Phiên bản 1.1 — 2026-09-21. Bộ tài liệu dành cho AI coding agent triển khai ba hệ thống độc lập, theo thứ tự dưới đây.
+Phiên bản 1.2 — 2026-09-21. Bộ tài liệu dành cho AI coding agent triển khai ba hệ thống độc lập, theo thứ tự dưới đây.
 
 | Thứ tự | File triển khai độc lập | Trọng tâm chuyên khoa |
 |---|---|---|
@@ -12,7 +12,7 @@ Phiên bản 1.1 — 2026-09-21. Bộ tài liệu dành cho AI coding agent tri�
 
 Đưa **một file chuyên khoa** cho AI và yêu cầu triển khai theo hướng dẫn sau. Mỗi file tự chứa toàn bộ core, màn hình, dữ liệu, workflow, API, module chuyên khoa, seed và acceptance criteria; không cần ghép ba file hoặc đọc tài liệu Cynca trong repo này.
 
-> Hãy triển khai hệ thống Mini App + CRM theo toàn bộ file đặc tả được đính kèm. Làm P0 trước, dùng backend và database lưu bền vững, tách adapter mock/live, không dùng localStorage làm database nghiệp vụ. Triển khai module chuyên khoa riêng của file, thực hiện checklist screen IDs và acceptance criteria, rồi bàn giao source, migration, seed/reset, OpenAPI, DEMO.md, hướng dẫn chạy và kết quả kiểm thử. Không thay chức năng bằng nút giả thành công. Áp dụng các mặc định đã chốt trong đặc tả; ghi khác biệt cần thiết vào DECISIONS.md. Chưa có credentials thì hoàn tất demo bằng mock adapter, không chặn các luồng còn lại. Thiết kế đẹp và chuyên nghiệp là P0: tuân thủ hướng thiết kế riêng tại mục 3.4–3.8; dùng ảnh tham khảo để học bố cục, xây nhận diện và layout khác biệt cho từng chuyên khoa và từng clinic, không chỉ đổi màu/logo. Bàn giao DESIGN-BRIEF.md, themes/tokens, component gallery, asset manifest và ảnh QA; nghiệm thu đủ DESIGN-AC01–10.
+> Hãy triển khai hệ thống Mini App + CRM theo toàn bộ file đặc tả được đính kèm. Làm P0 trước, dùng backend và database lưu bền vững, tách adapter mock/live, không dùng localStorage làm database nghiệp vụ. Triển khai module chuyên khoa riêng của file, thực hiện checklist screen IDs và acceptance criteria, rồi bàn giao source, migration, seed/reset, OpenAPI, DEMO.md, hướng dẫn chạy và kết quả kiểm thử. Không thay chức năng bằng nút giả thành công. Áp dụng các mặc định đã chốt trong đặc tả; ghi khác biệt cần thiết vào DECISIONS.md. Chưa có credentials thì hoàn tất demo bằng mock adapter, không chặn các luồng còn lại. Thiết kế đẹp và chuyên nghiệp là P0: tuân thủ hướng thiết kế riêng tại mục 3.4–3.8; dùng ảnh tham khảo để học bố cục, xây nhận diện và layout khác biệt cho từng chuyên khoa và từng clinic, không chỉ đổi màu/logo. Bàn giao DESIGN-BRIEF.md, themes/tokens, component gallery, asset manifest và ảnh QA; nghiệm thu đủ DESIGN-AC01–10. Triển khai trang quản trị theo toàn bộ mục 6: dashboard theo role, C01–C36, các workspace chuyên khoa, CMS/publish và cấu hình. Mỗi màn phải có bố cục, dữ liệu, form, action, state, quyền và API chạy thật; bàn giao ADMIN-SCREEN-MATRIX.md, ADMIN-GUIDE.md và pass ADMIN-AC01–20.
 
 Hoàn thành và nghiệm thu Nha khoa trước, tiếp tục Da liễu, rồi Đa khoa. Có thể tái sử dụng package core; mỗi hệ thống giữ cấu hình, DB, danh tính và dữ liệu demo độc lập. Bộ file này là **đặc tả**, chưa phải mã nguồn hệ thống đã triển khai.
 
@@ -21,13 +21,13 @@ Hoàn thành và nghiệm thu Nha khoa trước, tiếp tục Da liễu, rồi �
 1. Mục tiêu, phạm vi P0/P1 và mặc định triển khai.
 2. Persona, sitemap và yêu cầu UI responsive.
 3. Luồng Mini App → tiếp nhận → khám → thực hiện/cấp phát → thu tiền → chia sẻ → tái khám.
-4. Màn hình Mini App M01–M17 và CRM C01–C29; màn hình riêng D/S/G.
+4. Màn hình Mini App M01–M17 và CRM/quản trị C01–C36; màn hình riêng D/S/G.
 5. Trường dữ liệu, validation, trạng thái, quyền chuyển và transaction.
 6. Module chuyên khoa với mô hình, API, báo cáo và kịch bản riêng.
 7. Lịch, hồ sơ, đơn thuốc, kho/lô/vật tư và tính tiền/công nợ/hoàn tiền.
 8. Phân quyền theo vai trò/phạm vi, audit, consent và quyền truy cập tệp.
 9. Dashboard/report, API core, quan hệ dữ liệu, sự kiện và tích hợp.
-10. Cấu trúc thư mục, lộ trình triển khai, seed deterministic, 24 tiêu chí core, 10 tiêu chí chuyên khoa và 10 tiêu chí thiết kế.
+10. Cấu trúc thư mục, lộ trình triển khai, seed deterministic, 24 tiêu chí core, 10 tiêu chí chuyên khoa và 10 tiêu chí thiết kế và 20 tiêu chí quản trị.
 
 ## Hướng thiết kế bắt buộc
 
@@ -44,6 +44,25 @@ Thiết kế là P0 cho cả Mini App và CRM. Mục 3.4–3.8 trong mỗi file 
 Giữ tinh thần ảnh bác sĩ nổi bật, card gọn, khoảng trắng và CTA rõ từ ảnh; tạo composition phù hợp riêng cho mỗi hệ thống. Ảnh này chỉ làm reference thiết kế, không là tài sản production; không sao chép logo, tên, rating, giá hoặc watermark. Mỗi clinic có brand profile riêng và một fixture B để kiểm tra khác biệt ít nhất ba chiều, gồm ít nhất một chiều bố cục/thứ tự nội dung. Chi nhánh cùng thương hiệu thừa kế nhận diện clinic.
 
 Bằng chứng nghiệm thu: screenshot từ app chạy thật, theme tokens, component states, kiểm tra tương phản/responsive và 10 DESIGN-AC. Chỉ đổi màu trên template chung hoặc có giao diện đúng chức năng nhưng sơ sài chưa được tính là hoàn tất. Bộ tài liệu này quy định đầu ra thiết kế cho lần triển khai; chưa phải bộ mockup hoặc ứng dụng đã được xây dựng.
+
+## Đặc tả trang quản trị chi tiết
+
+Mục 6 trong từng file đã có đặc tả thao tác và giao diện cho **36 màn hình/nhóm màn quản trị**, cộng các workspace riêng của từng chuyên khoa. Các nhóm được mô tả gồm:
+
+- Khung sidebar/topbar, dashboard theo vai trò, bảng/filter, drawer/form, responsive và xử lý lỗi.
+- Liên hệ, bệnh nhân, lịch, hàng đợi, lượt khám, chỉ định, kết quả, đơn thuốc và cấp phát.
+- Kho/lô, nhập/chuyển/kiểm kê, hóa đơn, thu/hoàn tiền, ca thu ngân, công việc và báo cáo.
+- Nhân sự/phân quyền, lịch làm việc, danh mục, biểu mẫu, tích hợp và audit.
+- Nội dung Mini App: trang chủ, dịch vụ, bác sĩ, media thương hiệu, nhận diện clinic, mẫu và nhật ký thông báo.
+- Quy trình nháp → review → publish/rollback, quyền CMS tách chuyên môn, API/schema bổ sung, 6 scenario và 20 tiêu chí nghiệm thu quản trị.
+
+| Hệ thống | Workspace quản trị riêng |
+|---|---|
+| [Nha khoa — mục 6](01-NHA-KHOA-SPEC.md) | Lịch ghế, chart răng, nha chu, kế hoạch/thủ thuật, labo, chỉnh nha, tiệt khuẩn |
+| [Da liễu — mục 6](02-DA-LIEU-SPEC.md) | Body map, ảnh/so sánh ảnh, liệu trình/buổi, home care, consent và phản ánh |
+| [Đa khoa — mục 6](03-DA-KHOA-SPEC.md) | Visit đa khoa, sinh hiệu, queue khoa, mẫu/kết quả, hình ảnh, chuyển khám và đối chiếu thuốc |
+
+Admin là một vai trò; không mặc nhiên có quyền đọc bệnh án/ký đơn/thu tiền. Các mô tả này là yêu cầu xây dựng, chưa phải ứng dụng đã được triển khai.
 
 ## Các quyết định đã chốt
 
